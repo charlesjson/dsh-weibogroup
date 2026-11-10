@@ -1,0 +1,12 @@
+{
+  "project": "weibogroup",
+  "license": "ISC",
+  "revision": "a61bfbb92a8e2ec4c1de9b45b95674a444eab23c",
+  "dirty": false,
+  "openapiSha256": "014254bf84fc37686a773247089707eb01e36e53c77693598721a9ee143d31bc",
+  "files": {
+    "src/mcp/openapi-tools.ts": "7368cd6f3c5b9fe83978523cf90b8db57ff280b1c1ce55984228415fbfbe0df7",
+    "src/mcp/http-tools.ts": "799cf91730a5dadfbc74c213e1a898ce3bcf149ede53ac56fde808ae966a2f6a",
+    "src/http/bounded-fetch.ts": "f71bb39064b62de9886ddee85d13156e4d5f3a8f46eabbc98d44f16bf23f57c9"
+  }
+}

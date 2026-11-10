@@ -1,0 +1,40 @@
+{
+  "date": "2026-11-11",
+  "timezone": "Asia/Shanghai",
+  "plugin": "dsh-weibogroup@0.2.1",
+  "backend": "1.0.25",
+  "backendCodeCommit": "a61bfbb92a8e2ec4c1de9b45b95674a444eab23c",
+  "testsPassed": 8,
+  "actualHarnessToolRuntimeTest": true,
+  "actualDesktopRuntime": "0.2.2-rc.1",
+  "actualCliRuntime": "0.2.0-rc.2",
+  "readOnlyTools": 18,
+  "realDshNativeCoverage": 18,
+  "desktopProfileInstalled": true,
+  "webProfileInstalled": true,
+  "headlessProfileInstalled": true,
+  "apiPressure": {
+    "totalCalls": 190,
+    "failedCalls": 0,
+    "unavailableCalls": 10,
+    "unavailableOperations": [
+      "marketQuote"
+    ],
+    "concurrency": 4,
+    "rounds": 10
+  },
+  "historicalPrimaryKeysVerified": 526811,
+  "credentialsIncludedInPackage": false,
+  "moduleStructure": [
+    "config",
+    "api/client",
+    "api/catalog",
+    "api/connection",
+    "api/transport",
+    "harness/register",
+    "harness/instructions",
+    "contracts",
+    "vendor"
+  ],
+  "upstreamSynchronization": "scripts/sync-api.mjs records contract/module hashes and backend revision in vendor-provenance.json"
+}

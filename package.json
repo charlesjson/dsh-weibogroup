@@ -1,0 +1,56 @@
+{
+  "name": "dsh-weibogroup",
+  "version": "0.2.1",
+  "description": "DeepSeek Harness 微博群聊只读自然语言问答工具",
+  "type": "module",
+  "license": "ISC",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "vendor-provenance.json"
+  ],
+  "engines": {
+    "node": ">=22.19.0",
+    "dsh": "0.2.0-rc.2 || 0.2.2-rc.1"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "prepack": "npm run build",
+    "sync-api": "node scripts/sync-api.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.4",
+    "@deepseek-ai/dsh-tools": "0.2.0-rc.2 || 0.2.2-rc.1",
+    "@deepseek-ai/dsh-mcp-client": "0.2.0-rc.2 || 0.2.2-rc.1",
+    "@deepseek-ai/dsh-system-prompt": "0.2.0-rc.2 || 0.2.2-rc.1"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "~3.18.4",
+    "@modelcontextprotocol/sdk": "1.29.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "typescript": "^5.9.3"
+  }
+}
