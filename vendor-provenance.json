@@ -1,12 +1,13 @@
 {
   "project": "weibogroup",
   "license": "ISC",
-  "revision": "530788897d537d246fc66f80a71c978f07ed42d8",
+  "revision": "2e4ec9091f39e696b8d4123ba72dc4bfc3e2ea33",
   "dirty": false,
-  "openapiSha256": "ead2a9ecb50127d4811cba8ea6df3a31b9d9ee773210c4fa45e733e02db7dec3",
+  "openapiSha256": "3e91d5a6ebf3485b5172c4a112e9f1503cf836f60d54ea0901f93c16329bca3b",
   "files": {
     "src/mcp/openapi-tools.ts": "e5338a210c13ebf5876bd5edd6f45972017e89212afe2058ba8752e216148e90",
     "src/mcp/http-tools.ts": "799cf91730a5dadfbc74c213e1a898ce3bcf149ede53ac56fde808ae966a2f6a",
-    "src/http/bounded-fetch.ts": "f71bb39064b62de9886ddee85d13156e4d5f3a8f46eabbc98d44f16bf23f57c9"
+    "src/http/bounded-fetch.ts": "f71bb39064b62de9886ddee85d13156e4d5f3a8f46eabbc98d44f16bf23f57c9",
+    "src/http/image-payload.ts": "8038fa830a7f268edb268578c23d90e6fddda43a7155658c5911bb9a568ce195"
   }
 }

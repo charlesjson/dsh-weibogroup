@@ -19,7 +19,7 @@ const document = execFileSync(process.execPath, ['--import', 'tsx'], { cwd: sour
 JSON.parse(document)
 await mkdir(resolve(projectRoot, 'src/contracts'), { recursive: true })
 await writeFile(resolve(projectRoot, 'src/contracts/openapi.json'), document)
-const files = { 'src/mcp/openapi-tools.ts': 'openapi-tools.ts', 'src/mcp/http-tools.ts': 'http-tools.ts', 'src/http/bounded-fetch.ts': 'bounded-fetch.ts' }
+const files = { 'src/mcp/openapi-tools.ts': 'openapi-tools.ts', 'src/mcp/http-tools.ts': 'http-tools.ts', 'src/http/bounded-fetch.ts': 'bounded-fetch.ts', 'src/http/image-payload.ts': 'image-payload.ts' }
 const hashes = {}
 for (const [source, target] of Object.entries(files)) {
   const original = await readFile(resolve(sourceRoot, source), 'utf8')

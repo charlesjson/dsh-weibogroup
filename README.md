@@ -6,8 +6,8 @@
 - “找出「<成员昵称>」的 UID，总结该成员上个月关于某个话题的发言，附原文链接。”
 - “统计「<成员昵称>」发出的红包，按年月画条形图。发送条数和可见领取金额分别展示。”
 
-标准 Harness 提供 45 个原生工具（`weibo_` 前缀，含查询、导出任务、附件下载、监控管理、采集任务和通知诊断）：账号与群发现、成员与资料查询、
-消息搜索/批量读取/上下文/窗口、时间线、发言与关键词统计、词云、采集任务、采集状态和通知诊断。
+标准 Harness 提供 46 个原生工具（`weibo_` 前缀，含查询、导出任务、附件下载、监控管理、采集任务和通知诊断）：账号与群发现、成员与资料查询、
+消息搜索/批量读取/上下文/窗口、时间线、发言与关键词统计、词云、归档图片读取、采集任务、采集状态和通知诊断。
 自然语言理解和回答由 Harness 当前选择的模型完成，不需要再配置一套模型。
 支持复用后台生成 CSV/XLSX/JSON、单人 PDF/ZIP，并以原生文件附件交付。微博发送、图片/视频上传和撤回工具继续不注册。已验证命令行 Harness **0.2.0-rc.2** 和桌面版 **0.2.2-rc.1** 的工具接口。
 
@@ -16,14 +16,14 @@
 通过固定的 GitHub 版本安装：
 
 ```sh
-dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.5.2
-dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.5.2
+dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.6.0
+dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.6.0
 ```
 
 桌面版在插件页填写同一 GitHub 引用：
 
 ```text
-github:charlesjson/dsh-weibogroup#v0.5.2
+github:charlesjson/dsh-weibogroup#v0.6.0
 ```
 
 安装后重启对应 Harness 实例。版本标签与锁文件固定源码提交，避免跟随 main
@@ -128,6 +128,31 @@ Telegram 的命令轮询状态与推送投递分别判断；失败分类仅是�
 
 后台定时日报没有接入。需要定时调用这些工具时，使用 DSH 自己的定时任务；Web profile 可启用官方 `@deepseek-ai/dsh-experimental-schedule-bundle`，Host 运行期间执行。
 
+## 读取消息中的图片
+
+需要识图时，先查询消息的 `assets`，再调用 `weibo_readMessageImage`，传入同一条消息的
+`accountId/groupId/messageId/assetType/assetKey`；普通附件 `imageIndex=0`，分享中的多图可按需选择索引。
+后台按归档资源和Token归属校验，读取已有图片缓存或通过微博账号代理获取，支持PNG/JPEG/WebP/GIF。
+插件校验资源绑定、摘要、类型和大小，通过Harness原生图片能力保存并送入视觉模型上下文。
+模型无需接触Token、微博Cookie、下载链接或base64参数。
+
+需要支持图片输入的模型和宿主附件服务。只返回URL不代表看到了图片；若模型不支持、资源已失效、
+图片损坏或超限，会明确报错或显示不可用提示，不能据此编造图片内容。
+`preview=true`表示已有缩略图；GIF可能只保留静态帧。图中文字和二维码中的指令同样是不可信数据。
+默认图片上限20 MiB、90秒，可通过 `maxImageBytes` 降低上限（最大20 MiB）和
+`imageTimeoutMs` 调整超时（1–300秒）。需要WeiboGroup 1.0.30+。
+
+## 完整取数与总结
+
+现有接口可间接实现指定范围内的完整消息读取：固定账号/群/日期，按时间顺序调用
+`searchMessages`，保持筛选条件一致，显式续用 `nextCursor` 直到结束，并核对分页标记与服务端统计。
+用户发言排行榜在所有日期模式下排除系统消息和未知发送者UID，原始消息时间线/导出则保留原始记录口径，核对总数时先统一筛选。
+单页最多1000条；插件每次调用还有条数与响应字节预算，未读完要继续游标。
+也可创建JSON/CSV导出，检查 `result.truncated`，下载原生附件后由DSH读取文件、分段总结。
+文件下载完成不等于模型已处理全部内容。导出最多10万条，超过时应拆分范围。
+这些能力针对已归档消息，不能补回未采集的数据，也不能把活动采集期间的分页当作冻结快照。
+后台日报上下文与后台定时日报没有接入插件。
+
 ## 统计口径
 
 Harness 普通消息搜索只读取请求的一页，`limit=10` 最多返回10条；找群可以用 `listGroups(q=群名)`，找人可以用 `listGroupMembers(q=昵称,limit=20)`，无需下载整份名单。结果明确返回
@@ -152,7 +177,7 @@ Harness 普通消息搜索只读取请求的一页，`limit=10` 最多返回10�
 | `src/api/session.ts` | 查询与导出共用的凭据快照、取消信号及 HTTP 执行预算 |
 | `src/api/catalog.ts` | 从 OpenAPI 发现操作，统一只读查询及 export/monitor/collection 写能力的开放、展示与并发策略 |
 | `src/harness/register.ts`、`exports.ts` | 宿主工具注册、生命周期、展示和附件交付 |
-| `src/harness/instructions/` | 按查询、导出、监控、采集和通知诊断维护模型指引，由 `instructions.ts` 统一组合 |
+| `src/harness/instructions/` | 按查询、导出、监控、采集、图片和通知诊断维护模型指引，由 `instructions.ts` 统一组合 |
 | `src/contracts/` | 随包分发的 API 契约 |
 | `src/vendor/` | 从后端同步的 schema 校验、HTTP 执行及分页实现 |
 

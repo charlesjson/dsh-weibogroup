@@ -3,7 +3,7 @@
   "info": {
     "title": "Weibo Group AI API",
     "description": "Versioned API for querying archived Weibo group messages, users, groups and analytics, plus background archive exports, existing keyword/sender monitors, owned collection tasks and notification diagnostics, and sending text and image messages to owned groups. Use stable operationId values as AI tool names or expose them through the bundled MCP stdio adapter. Send API tokens as Bearer credentials; message-send operations require the api:write token scope.",
-    "version": "1.5.0"
+    "version": "1.6.0"
   },
   "components": {
     "securitySchemes": {
@@ -6145,7 +6145,7 @@
         "tags": [
           "analytics"
         ],
-        "description": "Returns a ranked sender-count page for the requested inclusive from/to range, or the full archive when dates are omitted. Use this for questions such as who spoke most last week instead of one timeline query per member.",
+        "description": "Counts non-deleted, non-system messages with a known sender UID in every date mode. Returns a ranked sender-count page for the inclusive from/to range, or all archived dates when omitted. Raw message timelines/exports can include system messages and unknown senders; align filters before comparing totals. Use this for questions such as who spoke most last week instead of one timeline query per member.",
         "parameters": [
           {
             "schema": {
@@ -19462,6 +19462,376 @@
           }
         }
       }
+    },
+    "/api/v1/messages/image": {
+      "get": {
+        "operationId": "getMessageImage",
+        "summary": "Read an owned archived message image",
+        "tags": [
+          "assets"
+        ],
+        "description": "Requires api:read. Returns PNG/JPEG/WebP/GIF bytes for an exact owned, non-deleted archive asset. The server resolves stored image URLs and Weibo cookies, reusing the UI asset proxy/cache; caller-supplied URLs are not accepted. Source is bounded to 20 MiB. Binary response headers bind the selector and digest. A native Harness adapter converts it into durable image content for a vision-capable model; a URL or attachment filename alone does not establish visual access. GIF model admission may retain a static raster frame.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]+$"
+            },
+            "in": "query",
+            "name": "accountId",
+            "required": true,
+            "description": "Owned account ID from group/message discovery.",
+            "example": "account-id"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]+$"
+            },
+            "in": "query",
+            "name": "groupId",
+            "required": true,
+            "description": "Group ID paired with that account.",
+            "example": "group-id"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]+$"
+            },
+            "in": "query",
+            "name": "messageId",
+            "required": true,
+            "description": "Non-deleted message ID from searchMessages/getMessageContext.",
+            "example": "message-id"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]+$"
+            },
+            "in": "query",
+            "name": "assetType",
+            "required": true,
+            "description": "Exact assetType from the selected message assets.",
+            "example": "image"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]+$"
+            },
+            "in": "query",
+            "name": "assetKey",
+            "required": true,
+            "description": "Exact assetKey from that message; never invent a URL or key.",
+            "example": "image-key"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255,
+              "default": 0
+            },
+            "in": "query",
+            "name": "imageIndex",
+            "required": false,
+            "description": "Zero-based image within the selected asset; use 0 for a normal image attachment.",
+            "example": 0
+          }
+        ],
+        "security": [
+          {
+            "aiBearer": []
+          }
+        ],
+        "x-mcp-enabled": false,
+        "responses": {
+          "200": {
+            "description": "Successful read an owned archived message image response.",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request schema or filter combination is invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Stable machine-readable error code"
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  }
+                },
+                "example": {
+                  "code": "INVALID_REQUEST",
+                  "error": "Request validation failed"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Stable machine-readable error code"
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  }
+                },
+                "example": {
+                  "code": "INVALID_API_TOKEN",
+                  "error": "The API token is invalid"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The API token does not have the api:read scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Stable machine-readable error code"
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  }
+                },
+                "example": {
+                  "code": "API_TOKEN_SCOPE_REQUIRED",
+                  "error": "The API token requires the api:read scope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown/foreign/deleted message or asset, or a missing source image.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Stable machine-readable error code"
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  }
+                },
+                "example": {
+                  "code": "IMAGE_NOT_FOUND",
+                  "error": "Archived image not found"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The source image exceeds the server byte limit.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Stable machine-readable error code"
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  }
+                },
+                "example": {
+                  "code": "ASSET_TOO_LARGE",
+                  "error": "Image exceeds the size limit"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The selected asset or returned bytes are not a supported raster.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Stable machine-readable error code"
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  }
+                },
+                "example": {
+                  "code": "IMAGE_UNSUPPORTED_FORMAT",
+                  "error": "Only PNG, JPEG, WebP and GIF images are supported"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An unexpected server failure occurred; internal details are never returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Stable machine-readable error code"
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  }
+                },
+                "example": {
+                  "code": "INTERNAL_ERROR",
+                  "error": "Internal server error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "The archived image source could not return a complete valid image.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Stable machine-readable error code"
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  }
+                },
+                "example": {
+                  "code": "IMAGE_SOURCE_UNAVAILABLE",
+                  "error": "Image source is unavailable"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The source request timed out.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Stable machine-readable error code"
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  }
+                },
+                "example": {
+                  "code": "ASSET_FETCH_TIMEOUT",
+                  "error": "Image source request timed out"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "servers": [
@@ -19471,6 +19841,10 @@
     }
   ],
   "tags": [
+    {
+      "name": "assets",
+      "description": "Owner-bound archived image reads"
+    },
     {
       "name": "accounts",
       "description": "Monitored Weibo accounts and account-scoped groups"

@@ -1,3 +1,4 @@
+import { readArchiveImage } from './images.js';
 import { executeMcpTool } from '../vendor/http-tools.js';
 import { createApiSession } from './session.js';
 import { archiveToolCatalog } from './catalog.js';
@@ -7,6 +8,7 @@ export function createArchiveClient(config, fetchImpl) {
     const catalog = archiveToolCatalog();
     return {
         tools: catalog.tools,
+        readImage: (key, signal) => readArchiveImage(config, key, signal, fetchImpl),
         openExport: (id, signal) => openExportDownload(config, catalog, id, signal, fetchImpl),
         async call(name, args, signal) {
             const session = await createApiSession(config, signal, fetchImpl);

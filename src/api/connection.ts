@@ -23,7 +23,7 @@ export async function loadConnection(file = DEFAULT_CONNECTION_FILE): Promise<Co
   }
   if (!isRecord(value) || typeof value.baseUrl !== 'string'
     || typeof value.apiToken !== 'string' || !/^wg_ai_[A-Za-z0-9_-]{43}$/.test(value.apiToken)) {
-    throw new Error('微博群聊连接配置无效；需要 baseUrl 和有效的只读 API Token。')
+    throw new Error('微博群聊连接配置无效；需要 baseUrl 和有效的 API Token。')
   }
   let baseUrl: URL
   try { baseUrl = new URL(value.baseUrl) } catch { throw new Error('微博群聊 baseUrl 必须为绝对 HTTP(S) 地址。') }
