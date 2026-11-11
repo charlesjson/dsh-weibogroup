@@ -60,6 +60,23 @@ test('authenticated export download preserves UTF-8 bytes and filename without r
   } finally { await download.close() }
 })
 
+test('one export keeps the same credential snapshot when its configuration rotates after metadata', async t => {
+  const rotatedToken = 'wg_ai_' + 'y'.repeat(43)
+  const { client, config, calls } = await fixture(t, async url => {
+    if (!url.pathname.endsWith('/download')) {
+      await writeFile(config.connectionFile, JSON.stringify({ baseUrl: 'https://other.example', apiToken: rotatedToken }), { mode: 0o600 })
+    }
+    return normal(url)
+  })
+  const download = await client.openExport(id, new AbortController().signal)
+  try {
+    const received = []; for await (const chunk of download.data) received.push(chunk)
+    assert.deepEqual(Buffer.concat(received), bytes)
+    assert.equal(calls.length, 2)
+    assert.ok(calls.every(url => url.origin === 'https://archive.example'))
+  } finally { await download.close() }
+})
+
 test('not-ready and oversized exports fail before the binary request', async t => {
   for (const [metadata, overrides, message] of [[{ ...job, status: 'running' }, {}, /EXPORT_NOT_READY/], [{ ...job, status: 'failed', errorCode: 'NO_MESSAGES' }, {}, /EXPORT_JOB_FAILED: NO_MESSAGES/], [job, { maxExportBytes: 1 }, /EXPORT_TOO_LARGE/]]) {
     const { client, calls } = await fixture(t, () => Response.json({ job: metadata }), overrides)

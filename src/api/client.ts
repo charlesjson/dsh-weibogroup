@@ -1,8 +1,7 @@
 import type { CallToolResult, Tool } from '@modelcontextprotocol/sdk/types.js'
 import type { Config } from '../config.js'
 import { executeMcpTool } from '../vendor/http-tools.js'
-import { loadConnection } from './connection.js'
-import { authenticatedFetch } from './transport.js'
+import { createApiSession } from './session.js'
 import { archiveToolCatalog } from './catalog.js'
 import { openExportDownload, type ExportDownload } from './exports.js'
 
@@ -19,14 +18,10 @@ export function createArchiveClient(config: Config, fetchImpl?: typeof fetch): A
     tools: catalog.tools,
     openExport: (id, signal) => openExportDownload(config, catalog, id, signal, fetchImpl),
     async call(name, args, signal) {
-      signal.throwIfAborted()
-      const connection = await loadConnection(config.connectionFile)
-      signal.throwIfAborted()
+      const session = await createApiSession(config, signal, fetchImpl)
       return executeMcpTool(catalog, name, args, {
-        apiBaseUrl: connection.baseUrl, apiToken: connection.apiToken,
-        timeoutMs: config.timeoutMs, maxResponseBytes: config.maxResponseBytes,
+        ...session,
         maxAutoPaginatedMessages: Math.min(config.maxMessages, typeof args.limit === 'number' ? args.limit : 100),
-        fetch: authenticatedFetch(connection.baseUrl, signal, fetchImpl),
       })
     },
   }

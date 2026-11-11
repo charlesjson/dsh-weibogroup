@@ -1,18 +1,13 @@
 import { DEFAULT_EXPORT_TIMEOUT_MS, DEFAULT_MAX_EXPORT_BYTES } from '../config.js';
 import { executeMcpTool } from '../vendor/http-tools.js';
 import { isRecord } from '../vendor/helpers.js';
-import { loadConnection } from './connection.js';
-import { authenticatedFetch } from './transport.js';
+import { createApiSession } from './session.js';
 /** A fixed, authenticated route and byte stream, never a model-supplied URL. */
 export async function openExportDownload(config, catalog, id, source, fetchImpl) {
     source.throwIfAborted();
     const signal = AbortSignal.any([source, AbortSignal.timeout(config.exportTimeoutMs ?? DEFAULT_EXPORT_TIMEOUT_MS)]);
-    const connection = await loadConnection(config.connectionFile);
-    const transport = authenticatedFetch(connection.baseUrl, signal, fetchImpl);
-    const result = await executeMcpTool(catalog, 'getExportJob', { id }, {
-        apiBaseUrl: connection.baseUrl, apiToken: connection.apiToken,
-        timeoutMs: config.timeoutMs, maxResponseBytes: config.maxResponseBytes, fetch: transport,
-    });
+    const session = await createApiSession(config, signal, fetchImpl);
+    const result = await executeMcpTool(catalog, 'getExportJob', { id }, session);
     if (result.isError)
         throw new Error(result.content.filter(block => block.type === 'text').map(block => block.text).join('\n'));
     const job = result.structuredContent?.job;
@@ -36,10 +31,10 @@ export async function openExportDownload(config, catalog, id, source, fetchImpl)
             ...(typeof summary.failedAssetCount === 'number' ? { failedAssetCount: summary.failedAssetCount } : {}) } : null;
     if (size > maximum)
         throw new Error(`EXPORT_TOO_LARGE: 文件超过下载上限 ${maximum} 字节，请缩小导出范围。`);
-    const base = new URL(connection.baseUrl);
+    const base = new URL(session.apiBaseUrl);
     base.pathname = base.pathname.replace(/\/+$/, '') + '/';
     const url = new URL(`api/v1/exports/${encodeURIComponent(id)}/download`, base);
-    const response = await transport(url, { headers: { authorization: `Bearer ${connection.apiToken}`, accept: contentType, 'accept-encoding': 'identity' } });
+    const response = await session.fetch(url, { headers: { authorization: `Bearer ${session.apiToken}`, accept: contentType, 'accept-encoding': 'identity' } });
     const close = async () => { await response.body?.cancel().catch(() => undefined); };
     if (!response.ok) {
         await close();

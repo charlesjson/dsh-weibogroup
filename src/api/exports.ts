@@ -3,8 +3,7 @@ import { DEFAULT_EXPORT_TIMEOUT_MS, DEFAULT_MAX_EXPORT_BYTES } from '../config.j
 import type { McpToolCatalog } from '../vendor/openapi-tools.js'
 import { executeMcpTool } from '../vendor/http-tools.js'
 import { isRecord } from '../vendor/helpers.js'
-import { loadConnection } from './connection.js'
-import { authenticatedFetch } from './transport.js'
+import { createApiSession } from './session.js'
 
 export interface ExportDownload {
   id: string; filename: string; contentType: string; size: number
@@ -17,12 +16,8 @@ export interface ExportDownload {
 export async function openExportDownload(config: Config, catalog: McpToolCatalog, id: string, source: AbortSignal, fetchImpl?: typeof fetch): Promise<ExportDownload> {
   source.throwIfAborted()
   const signal = AbortSignal.any([source, AbortSignal.timeout(config.exportTimeoutMs ?? DEFAULT_EXPORT_TIMEOUT_MS)])
-  const connection = await loadConnection(config.connectionFile)
-  const transport = authenticatedFetch(connection.baseUrl, signal, fetchImpl)
-  const result = await executeMcpTool(catalog, 'getExportJob', { id }, {
-    apiBaseUrl: connection.baseUrl, apiToken: connection.apiToken,
-    timeoutMs: config.timeoutMs, maxResponseBytes: config.maxResponseBytes, fetch: transport,
-  })
+  const session = await createApiSession(config, signal, fetchImpl)
+  const result = await executeMcpTool(catalog, 'getExportJob', { id }, session)
   if (result.isError) throw new Error(result.content.filter(block => block.type === 'text').map(block => block.text).join('\n'))
   const job = result.structuredContent?.job
   if (!isRecord(job)) throw new Error('EXPORT_INVALID_METADATA')
@@ -39,10 +34,10 @@ export async function openExportDownload(config: Config, catalog: McpToolCatalog
     ? { messageCount: summary.messageCount, truncated: summary.truncated,
       ...(typeof summary.failedAssetCount === 'number' ? { failedAssetCount: summary.failedAssetCount } : {}) } : null
   if (size > maximum) throw new Error(`EXPORT_TOO_LARGE: 文件超过下载上限 ${maximum} 字节，请缩小导出范围。`)
-  const base = new URL(connection.baseUrl)
+  const base = new URL(session.apiBaseUrl)
   base.pathname = base.pathname.replace(/\/+$/, '') + '/'
   const url = new URL(`api/v1/exports/${encodeURIComponent(id)}/download`, base)
-  const response = await transport(url, { headers: { authorization: `Bearer ${connection.apiToken}`, accept: contentType, 'accept-encoding': 'identity' } })
+  const response = await session.fetch(url, { headers: { authorization: `Bearer ${session.apiToken}`, accept: contentType, 'accept-encoding': 'identity' } })
   const close = async () => { await response.body?.cancel().catch(() => undefined) }
   if (!response.ok) { await close(); throw new Error(`EXPORT_DOWNLOAD_FAILED: HTTP ${response.status}`) }
   const actualType = response.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase()

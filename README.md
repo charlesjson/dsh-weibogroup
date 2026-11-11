@@ -129,6 +129,7 @@ Harness 普通消息搜索只读取请求的一页，`limit=10` 最多返回10�
 | `src/config.ts` | 配置 schema、默认值与边界校验 |
 | `src/api/client.ts`、`exports.ts` | 与 Harness 无关的归档客户端及有界文件流；统一鉴权、取消及返回预算 |
 | `src/api/connection.ts`、`transport.ts` | 凭据文件、HTTPS、来源限制与重定向保护 |
+| `src/api/session.ts` | 查询与导出共用的凭据快照、取消信号及 HTTP 执行预算 |
 | `src/api/catalog.ts` | 从 OpenAPI 发现操作，统一只读查询及 export/monitor 写能力的开放、展示与并发策略 |
 | `src/harness/register.ts`、`exports.ts` | 宿主工具注册、生命周期、展示和附件交付 |
 | `src/harness/instructions/` | 按查询、导出、监控维护模型指引，由 `instructions.ts` 统一组合 |
