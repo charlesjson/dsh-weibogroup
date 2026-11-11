@@ -1,13 +1,13 @@
 # 微博群聊问答 · DeepSeek Harness
 
-在 Harness 中直接询问微博群聊归档，例如：
+在 Harness 中直接询问微博群聊归档。以下尖括号内容均为占位符，不代表真实用户或群组，例如：
 
 - “列出我归档的群。”
-- “找出阿尼亚的 UID，总结她上个月关于 AI 的发言，附原文链接。”
-- “统计阿尼亚发出的红包，按年月画条形图。发送条数和可见领取金额分别展示。”
+- “找出「<成员昵称>」的 UID，总结该成员上个月关于某个话题的发言，附原文链接。”
+- “统计「<成员昵称>」发出的红包，按年月画条形图。发送条数和可见领取金额分别展示。”
 
-标准 Harness 提供 45 个原生工具（`weibo_` 前缀，含查询、导出任务、附件下载和监控管理）：账号与群发现、成员与资料查询、
-消息搜索/批量读取/上下文/窗口、时间线、发言与关键词统计、词云、市场报价。
+标准 Harness 提供 45 个原生工具（`weibo_` 前缀，含查询、导出任务、附件下载、监控管理、采集任务和通知诊断）：账号与群发现、成员与资料查询、
+消息搜索/批量读取/上下文/窗口、时间线、发言与关键词统计、词云、采集任务、采集状态和通知诊断。
 自然语言理解和回答由 Harness 当前选择的模型完成，不需要再配置一套模型。
 支持复用后台生成 CSV/XLSX/JSON、单人 PDF/ZIP，并以原生文件附件交付。微博发送、图片/视频上传和撤回工具继续不注册。已验证命令行 Harness **0.2.0-rc.2** 和桌面版 **0.2.2-rc.1** 的工具接口。
 
@@ -16,14 +16,14 @@
 通过固定的 GitHub 版本安装：
 
 ```sh
-dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.5.1
-dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.5.1
+dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.5.2
+dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.5.2
 ```
 
 桌面版在插件页填写同一 GitHub 引用：
 
 ```text
-github:charlesjson/dsh-weibogroup#v0.5.1
+github:charlesjson/dsh-weibogroup#v0.5.2
 ```
 
 安装后重启对应 Harness 实例。版本标签与锁文件固定源码提交，避免跟随 main
@@ -48,7 +48,7 @@ npm pack
 
 ```json
 {
-  "baseUrl": "https://weibogroup.chestnut.heiyu.space",
+  "baseUrl": "https://archive.example.com",
   "apiToken": "填入后台创建时显示的一次性 wg_ai_ Token"
 }
 ```
@@ -71,7 +71,7 @@ Token 每次调用时读取，轮换后无需重新打包。安装包不含网�
 
 ## 复用后台导出
 
-可以直接提问“把 tt 群最近三天消息导出成 Excel”或“把某成员上周的发言导出成 PDF”。
+可以直接提问“把 「<群名称>」最近三天消息导出成 Excel”或“把某成员上周的发言导出成 PDF”。
 
 1. `weibo_createMessageExport`：CSV、XLSX、JSON，支持日期、关键词及可选 senderUid/order（默认正序；最近N条用order=desc配合limit）；关键词按逗号/分号/换行分隔，匹配任一字面关键词，不是搜索接口的 Boolean q 语法。
 2. `weibo_createUserExport`：指定成员的 PDF 或 Markdown+图片 ZIP，保留后台个人阅读版的系统/平台提示过滤口径；CSV/XLSX/JSON 则保留 messageKind 原始分类。
@@ -86,7 +86,7 @@ Token 每次调用时读取，轮换后无需重新打包。安装包不含网�
 
 ## 后台关键词与发送者监控
 
-例如“监控 tt 群提到故障的消息，发到我的 Telegram”“把某条规则暂停”或
+例如“监控 「<群名称>」提到故障的消息，发到我的 Telegram”“把某条规则暂停”或
 “查看这条规则最近命中了什么、通知有没有发送”。支持 WeiboGroup 1.0.27+。
 
 - `weibo_listNotificationTargets`：发现已配置的 Telegram/Discord 目标，不返回 Bot 凭据。
@@ -110,7 +110,7 @@ hitCount 按规则/消息/关键词记录计算，同一条消息命中两个词
 
 ## 采集任务、采集状态和通知诊断
 
-可以提问“tt 群最近为什么没新消息”“暂停这条抓取任务”“重试失败的历史回填”或“这条监控为什么没通知”。
+可以提问“「<群名称>」最近为什么没新消息”“暂停这条抓取任务”“重试失败的历史回填”或“这条监控为什么没通知”。
 
 - `listHistoryJobs/getHistoryJob/getActiveHistoryJob`：查询后台同一份任务与进度。
 - `createHistoryJob/createHistoryBackfill`：分别创建有限页数抓取、按时长回填；任务可能复用已有活动任务。
@@ -152,7 +152,7 @@ Harness 普通消息搜索只读取请求的一页，`limit=10` 最多返回10�
 | `src/api/session.ts` | 查询与导出共用的凭据快照、取消信号及 HTTP 执行预算 |
 | `src/api/catalog.ts` | 从 OpenAPI 发现操作，统一只读查询及 export/monitor/collection 写能力的开放、展示与并发策略 |
 | `src/harness/register.ts`、`exports.ts` | 宿主工具注册、生命周期、展示和附件交付 |
-| `src/harness/instructions/` | 按查询、导出、监控维护模型指引，由 `instructions.ts` 统一组合 |
+| `src/harness/instructions/` | 按查询、导出、监控、采集和通知诊断维护模型指引，由 `instructions.ts` 统一组合 |
 | `src/contracts/` | 随包分发的 API 契约 |
 | `src/vendor/` | 从后端同步的 schema 校验、HTTP 执行及分页实现 |
 
@@ -161,7 +161,7 @@ Harness 普通消息搜索只读取请求的一页，`limit=10` 最多返回10�
 无需维护另一份接口名称白名单：
 
 ```sh
-npm run sync-api -- /opt/code/weibogroup
+npm run sync-api -- /path/to/weibogroup
 npm test
 npm pack
 ```
@@ -185,3 +185,5 @@ npm run smoke
 工具参数与输出由随包携带的 OpenAPI 契约校验；服务升级更改契约后，执行
 `sync-api` 更新 `src/contracts/openapi.json` 并重新打包。HTTP 校验及分页实现复用
 WeiboGroup 的 MCP 适配层，来源见 THIRD_PARTY_NOTICES.md。
+
+公开文档、截图和验收摘要仅使用占位数据。不要提交真实昵称、UID、群名、群ID、实例地址、凭据、会话/导出任务标识或聊天内容；详细运行证据应留在私有环境。
