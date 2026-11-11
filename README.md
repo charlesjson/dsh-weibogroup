@@ -16,14 +16,14 @@
 通过固定的 GitHub 版本安装：
 
 ```sh
-dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.5.0
-dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.5.0
+dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.5.1
+dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.5.1
 ```
 
 桌面版在插件页填写同一 GitHub 引用：
 
 ```text
-github:charlesjson/dsh-weibogroup#v0.5.0
+github:charlesjson/dsh-weibogroup#v0.5.1
 ```
 
 安装后重启对应 Harness 实例。版本标签与锁文件固定源码提交，避免跟随 main
@@ -122,7 +122,7 @@ hitCount 按规则/消息/关键词记录计算，同一条消息命中两个词
 采集写操作需要 `api:write`；查询需要 `api:read`。本组工具不删除历史消息，不发送测试通知。
 历史抓取不支持精确的日期停止条件；`count` 为每页条数，`pages` 为1–5。
 长回填默认30分钟，`durationMinutes=0` 只用于用户明确要求抓完全部历史的情况。
-无已知缺口不等于归档完整，`savedCount` 也不等于唯一新增消息数。
+缺失时间戳表示未记录或未知，不代表从未执行；无已知缺口不等于归档完整，`savedCount` 也不等于唯一新增消息数。
 通知统计默认最近24小时、最多31天，按记录创建时间筛选；没有任务时成功率为 null。
 Telegram 的命令轮询状态与推送投递分别判断；失败分类仅是诊断提示。
 
