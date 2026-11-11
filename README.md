@@ -129,13 +129,15 @@ Harness 普通消息搜索只读取请求的一页，`limit=10` 最多返回10�
 | `src/config.ts` | 配置 schema、默认值与边界校验 |
 | `src/api/client.ts`、`exports.ts` | 与 Harness 无关的归档客户端及有界文件流；统一鉴权、取消及返回预算 |
 | `src/api/connection.ts`、`transport.ts` | 凭据文件、HTTPS、来源限制与重定向保护 |
-| `src/api/catalog.ts` | 从 OpenAPI 发现只读操作 |
-| `src/harness/` | 工具注册、生命周期、展示及通用问答指引 |
+| `src/api/catalog.ts` | 从 OpenAPI 发现操作，统一只读查询及 export/monitor 写能力的开放、展示与并发策略 |
+| `src/harness/register.ts`、`exports.ts` | 宿主工具注册、生命周期、展示和附件交付 |
+| `src/harness/instructions/` | 按查询、导出、监控维护模型指引，由 `instructions.ts` 统一组合 |
 | `src/contracts/` | 随包分发的 API 契约 |
 | `src/vendor/` | 从后端同步的 schema 校验、HTTP 执行及分页实现 |
 
 扩展后端 API 时，在契约声明操作及读写语义，再执行同步和测试即可自动注册
-只读工具，无需维护另一份接口名称白名单：
+只读工具；写工具仅开放明确标注 export/monitor 能力的操作，发送和撤回微博消息不开放。
+无需维护另一份接口名称白名单：
 
 ```sh
 npm run sync-api -- /opt/code/weibogroup

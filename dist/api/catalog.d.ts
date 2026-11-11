@@ -1,3 +1,15 @@
+import type { Tool } from '@modelcontextprotocol/sdk/types.js';
+/** One policy controls exposure, host presentation and concurrency hints. */
+export declare function archiveToolPolicy(tool: Tool): {
+    readonly label: "查询";
+    readonly readOnly: true;
+} | {
+    readonly label: "导出任务";
+    readonly readOnly: false;
+} | {
+    readonly label: "监控设置";
+    readonly readOnly: false;
+} | undefined;
 /** Operation discovery and side-effect policy come from the API contract. */
 export declare function archiveToolCatalog(): {
     operations: Map<string, import("../vendor/openapi-tools.js").McpToolOperation>;

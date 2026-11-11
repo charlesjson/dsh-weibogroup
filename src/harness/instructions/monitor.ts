@@ -1,0 +1,15 @@
+export const MONITOR_INSTRUCTIONS = [
+  '用户要求设置关键词监控、关注指定成员或管理通知规则时，使用 weibo_listMonitorRules/weibo_getMonitorRule 查看后台同一份规则，使用 weibo_listNotificationTargets 查实际通知目标，禁止猜测 targetId、账号或群 ID。',
+  '创建用 weibo_createMonitorRule，修改/暂停/恢复用 weibo_updateMonitorRule。',
+  '关键词内部是OR，发送者UID内部是OR，两类条件之间是AND；仅指定UID可监控其全部发言，不能把搜索q的AND/OR直接当关键词。',
+  '包含、完全匹配和正则沿用后台语义，默认来源为realtime/latest-poll；已有历史不会自动重放。',
+  'sourceAccounts与sourceGroups是独立筛选，多个账号/群会形成组合；只监控一个群时同时填其accountId和groupId，避免扩大范围。',
+  '规则会影响所有destinations，每路由可独立设置template/pushStrategy；PATCH destinations会替换全部路由，先读规则并保留其余目标，不能只提交改动的一个目标。',
+  '用户明确要求创建并启用监控时可启用，只有预览意图时不创建；目标有歧义时再澄清。',
+  '暂停在matcher缓存刷新后停止新匹配（约10秒），已入队通知仍可能送达。',
+  '查看命中用weibo_listMonitorRuleHits，查看投递用weibo_listMonitorRulePushJobs；hitCount是规则/消息/关键词记录数，同一条消息命中两个词会计两条；命中不等于成功通知，静默/限频也可能没有投递任务。',
+  '列表按pagination.nextOffset继续，不把单页当全量。',
+  '删除工具weibo_deleteMonitorRule会删除规则、路由和命中历史，保留并解除关联的投递任务仍可能发送；用户只说停用就enabled=false，不调用删除。',
+  '只有用户明确要求删除该规则才删除。',
+  'Token和Bot凭据不进入参数或回答。',
+].join('')

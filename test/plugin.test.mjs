@@ -120,6 +120,13 @@ test('real Cordis effects register native Harness definitions and dispose cleanl
   const tool = definitions.get('weibo_listAccounts')
   assert.ok(tool.output.schema)
   assert.equal(tool.isConcurrencySafe({}), true)
+  assert.equal(tool.presentCall().kind, 'read')
+  for (const [name, label] of [['createMessageExport', '导出任务'], ['createMonitorRule', '监控设置']]) {
+    const write = definitions.get(`weibo_${name}`)
+    assert.match(write.description, new RegExp(`^\\[微博群聊${label}\\]`))
+    assert.equal(write.isConcurrencySafe({}), false)
+    assert.equal(write.presentCall().kind, 'execute')
+  }
   await assert.rejects(tool.execute({}, { signal: new AbortController().signal }), /连接配置/)
   await fork.dispose()
   assert.equal(definitions.size, 0)
