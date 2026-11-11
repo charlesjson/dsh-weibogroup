@@ -392,7 +392,7 @@ function buildOperation(
     description: operationDescription(operation, operationId),
     inputSchema,
     ...(outputSchema ? { outputSchema } : {}),
-    ...(['export', 'monitor'].includes(String(operation['x-weibogroup-capability']))
+    ...(['export', 'monitor', 'collection'].includes(String(operation['x-weibogroup-capability']))
       ? { _meta: { 'weibogroup/capability': operation['x-weibogroup-capability'] } } : {}),
     annotations: {
       ...(summary ? { title: summary } : {}),

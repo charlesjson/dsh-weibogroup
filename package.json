@@ -1,12 +1,17 @@
 {
   "name": "dsh-weibogroup",
-  "version": "0.4.0",
-  "description": "DeepSeek Harness 微博群聊问答、后台导出和关键词监控",
+  "version": "0.5.0",
+  "description": "DeepSeek Harness 微博群聊问答、导出、监控、采集任务和通知诊断",
   "type": "module",
   "license": "ISC",
-  "repository": { "type": "git", "url": "git+https://github.com/charlesjson/dsh-weibogroup.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/charlesjson/dsh-weibogroup.git"
+  },
   "homepage": "https://github.com/charlesjson/dsh-weibogroup#readme",
-  "bugs": { "url": "https://github.com/charlesjson/dsh-weibogroup/issues" },
+  "bugs": {
+    "url": "https://github.com/charlesjson/dsh-weibogroup/issues"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

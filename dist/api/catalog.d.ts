@@ -9,6 +9,9 @@ export declare function archiveToolPolicy(tool: Tool): {
 } | {
     readonly label: "监控设置";
     readonly readOnly: false;
+} | {
+    readonly label: "采集任务";
+    readonly readOnly: false;
 } | undefined;
 /** Operation discovery and side-effect policy come from the API contract. */
 export declare function archiveToolCatalog(): {

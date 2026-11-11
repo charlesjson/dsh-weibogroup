@@ -40,7 +40,7 @@ const normal = url => url.pathname.endsWith('/download')
 
 test('catalog permits file-generation writes but excludes Weibo sends and binary JSON tools', () => {
   const catalog = archiveToolCatalog()
-  assert.equal(catalog.tools.length, 29)
+  assert.equal(catalog.tools.length, 44)
   assert.equal(catalog.operations.get('createMessageExport').tool.annotations.readOnlyHint, false)
   assert.equal(catalog.operations.get('createUserExport').tool._meta['weibogroup/capability'], 'export')
   for (const name of ['sendGroupMessage', 'sendGroupImage', 'recallGroupMessage', 'sendGroupVideo', 'downloadExportFile', 'marketQuote']) assert.equal(catalog.operations.has(name), false)

@@ -6,13 +6,14 @@ const QUERY_POLICY = { label: '查询', readOnly: true } as const
 const WRITE_POLICIES = {
   export: { label: '导出任务', readOnly: false },
   monitor: { label: '监控设置', readOnly: false },
+  collection: { label: '采集任务', readOnly: false },
 } as const
 
 /** One policy controls exposure, host presentation and concurrency hints. */
 export function archiveToolPolicy(tool: Tool) {
   if (tool.annotations?.readOnlyHint === true) return QUERY_POLICY
   const capability = tool._meta?.['weibogroup/capability']
-  if (capability === 'export' || capability === 'monitor') return WRITE_POLICIES[capability]
+  if (capability === 'export' || capability === 'monitor' || capability === 'collection') return WRITE_POLICIES[capability]
   return undefined
 }
 

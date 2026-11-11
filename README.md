@@ -6,7 +6,7 @@
 - “找出阿尼亚的 UID，总结她上个月关于 AI 的发言，附原文链接。”
 - “统计阿尼亚发出的红包，按年月画条形图。发送条数和可见领取金额分别展示。”
 
-标准 Harness 提供 30 个原生工具（`weibo_` 前缀，含查询、导出任务、附件下载和监控管理）：账号与群发现、成员与资料查询、
+标准 Harness 提供 45 个原生工具（`weibo_` 前缀，含查询、导出任务、附件下载和监控管理）：账号与群发现、成员与资料查询、
 消息搜索/批量读取/上下文/窗口、时间线、发言与关键词统计、词云、市场报价。
 自然语言理解和回答由 Harness 当前选择的模型完成，不需要再配置一套模型。
 支持复用后台生成 CSV/XLSX/JSON、单人 PDF/ZIP，并以原生文件附件交付。微博发送、图片/视频上传和撤回工具继续不注册。已验证命令行 Harness **0.2.0-rc.2** 和桌面版 **0.2.2-rc.1** 的工具接口。
@@ -16,14 +16,14 @@
 通过固定的 GitHub 版本安装：
 
 ```sh
-dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.4.0
-dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.4.0
+dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.5.0
+dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.5.0
 ```
 
 桌面版在插件页填写同一 GitHub 引用：
 
 ```text
-github:charlesjson/dsh-weibogroup#v0.4.0
+github:charlesjson/dsh-weibogroup#v0.5.0
 ```
 
 安装后重启对应 Harness 实例。版本标签与锁文件固定源码提交，避免跟随 main
@@ -108,6 +108,26 @@ hitCount 按规则/消息/关键词记录计算，同一条消息命中两个词
 列表默认20条、最大100条，用 pagination.nextOffset 翻页。分页是实时视图，
 并发增删时顺序可能变化；truncated=true 代表还有记录，不能当作完整清单。
 
+## 采集任务、采集状态和通知诊断
+
+可以提问“tt 群最近为什么没新消息”“暂停这条抓取任务”“重试失败的历史回填”或“这条监控为什么没通知”。
+
+- `listHistoryJobs/getHistoryJob/getActiveHistoryJob`：查询后台同一份任务与进度。
+- `createHistoryJob/createHistoryBackfill`：分别创建有限页数抓取、按时长回填；任务可能复用已有活动任务。
+- `pauseHistoryJob/resumeHistoryJob/cancelHistoryJob/retryHistoryJob`：管理状态；重试返回新的任务 ID，取消运行任务可能等待当前页完成。
+- `requestGroupProfileSync`：复用群成员资料同步队列。
+- `getCrawlerStatus/getGroupCollectionStatus`：账号心跳、登录状态、熔断、队列、采集游标与已知缺口。
+- `listNotificationChannels/getNotificationStats/listNotificationPushJobs`：渠道配置状态、通知汇总与经过净化的失败分类，不返回 Bot/代理密钥、原始错误或投递内容。
+
+采集写操作需要 `api:write`；查询需要 `api:read`。本组工具不删除历史消息，不发送测试通知。
+历史抓取不支持精确的日期停止条件；`count` 为每页条数，`pages` 为1–5。
+长回填默认30分钟，`durationMinutes=0` 只用于用户明确要求抓完全部历史的情况。
+无已知缺口不等于归档完整，`savedCount` 也不等于唯一新增消息数。
+通知统计默认最近24小时、最多31天，按记录创建时间筛选；没有任务时成功率为 null。
+Telegram 的命令轮询状态与推送投递分别判断；失败分类仅是诊断提示。
+
+后台定时日报没有接入。需要定时调用这些工具时，使用 DSH 自己的定时任务；Web profile 可启用官方 `@deepseek-ai/dsh-experimental-schedule-bundle`，Host 运行期间执行。
+
 ## 统计口径
 
 Harness 普通消息搜索只读取请求的一页，`limit=10` 最多返回10条；找群可以用 `listGroups(q=群名)`，找人可以用 `listGroupMembers(q=昵称,limit=20)`，无需下载整份名单。结果明确返回
@@ -130,14 +150,14 @@ Harness 普通消息搜索只读取请求的一页，`limit=10` 最多返回10�
 | `src/api/client.ts`、`exports.ts` | 与 Harness 无关的归档客户端及有界文件流；统一鉴权、取消及返回预算 |
 | `src/api/connection.ts`、`transport.ts` | 凭据文件、HTTPS、来源限制与重定向保护 |
 | `src/api/session.ts` | 查询与导出共用的凭据快照、取消信号及 HTTP 执行预算 |
-| `src/api/catalog.ts` | 从 OpenAPI 发现操作，统一只读查询及 export/monitor 写能力的开放、展示与并发策略 |
+| `src/api/catalog.ts` | 从 OpenAPI 发现操作，统一只读查询及 export/monitor/collection 写能力的开放、展示与并发策略 |
 | `src/harness/register.ts`、`exports.ts` | 宿主工具注册、生命周期、展示和附件交付 |
 | `src/harness/instructions/` | 按查询、导出、监控维护模型指引，由 `instructions.ts` 统一组合 |
 | `src/contracts/` | 随包分发的 API 契约 |
 | `src/vendor/` | 从后端同步的 schema 校验、HTTP 执行及分页实现 |
 
 扩展后端 API 时，在契约声明操作及读写语义，再执行同步和测试即可自动注册
-只读工具；写工具仅开放明确标注 export/monitor 能力的操作，发送和撤回微博消息不开放。
+只读工具；写工具仅开放明确标注 export/monitor/collection 能力的操作，发送和撤回微博消息不开放。
 无需维护另一份接口名称白名单：
 
 ```sh
