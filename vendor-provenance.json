@@ -1,9 +1,9 @@
 {
   "project": "weibogroup",
   "license": "ISC",
-  "revision": "624adb435e8f496bb725283eca16ca518a2a207a",
+  "revision": "7462f9377645af0cc681a268645ec2b4c555175f",
   "dirty": false,
-  "openapiSha256": "91ccb3017ffe5586a1feeb5cf042d46e6fba5c3d96aeec623839eb9195181228",
+  "openapiSha256": "b5bcdd74675f1b6d3b263f726223ed4e8efa2856d2d15a75a2b6a774cd1ea8d7",
   "files": {
     "src/mcp/openapi-tools.ts": "7264d02f0cfbfeb2fe13a48fe6fac334532aa290fca287a4a63e14e582f1c825",
     "src/mcp/http-tools.ts": "799cf91730a5dadfbc74c213e1a898ce3bcf149ede53ac56fde808ae966a2f6a",
