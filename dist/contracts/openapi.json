@@ -2,8 +2,8 @@
     "openapi": "3.0.3",
     "info": {
         "title": "Weibo Group AI API",
-        "description": "Versioned API for querying archived Weibo group messages, users, groups and analytics, plus sending text and image messages to owned groups. Use stable operationId values as AI tool names or expose them through the bundled MCP stdio adapter. Send API tokens as Bearer credentials; message-send operations require the api:write token scope.",
-        "version": "1.2.0"
+        "description": "Versioned API for querying archived Weibo group messages, users, groups and analytics, plus background archive exports and sending text and image messages to owned groups. Use stable operationId values as AI tool names or expose them through the bundled MCP stdio adapter. Send API tokens as Bearer credentials; message-send operations require the api:write token scope.",
+        "version": "1.3.0"
     },
     "components": {
         "securitySchemes": {
@@ -256,7 +256,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -621,7 +621,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1108,7 +1108,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1594,7 +1594,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2018,7 +2018,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2500,7 +2500,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3334,7 +3334,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3937,7 +3937,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4231,7 +4231,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4818,7 +4818,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5427,7 +5427,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5639,7 +5639,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5908,7 +5908,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -6078,7 +6078,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -6373,7 +6373,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -6628,7 +6628,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -6898,7 +6898,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -7260,7 +7260,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:read scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -7587,7 +7587,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:write scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -7610,7 +7610,7 @@
                                 },
                                 "example": {
                                     "code": "API_TOKEN_SCOPE_REQUIRED",
-                                    "error": "The API token requires the api:read scope"
+                                    "error": "The API token requires the api:write scope"
                                 }
                             }
                         }
@@ -7803,7 +7803,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:write scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -7826,7 +7826,7 @@
                                 },
                                 "example": {
                                     "code": "API_TOKEN_SCOPE_REQUIRED",
-                                    "error": "The API token requires the api:read scope"
+                                    "error": "The API token requires the api:write scope"
                                 }
                             }
                         }
@@ -7994,7 +7994,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:write scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -8017,7 +8017,7 @@
                                 },
                                 "example": {
                                     "code": "API_TOKEN_SCOPE_REQUIRED",
-                                    "error": "The API token requires the api:read scope"
+                                    "error": "The API token requires the api:write scope"
                                 }
                             }
                         }
@@ -8255,7 +8255,7 @@
                         }
                     },
                     "403": {
-                        "description": "The Bearer API token does not have the api:read scope.",
+                        "description": "The API token does not have the api:write scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -8278,7 +8278,7 @@
                                 },
                                 "example": {
                                     "code": "API_TOKEN_SCOPE_REQUIRED",
-                                    "error": "The API token requires the api:read scope"
+                                    "error": "The API token requires the api:write scope"
                                 }
                             }
                         }
@@ -8308,6 +8308,1809 @@
                                 "example": {
                                     "code": "ACCOUNT_NOT_FOUND",
                                     "error": "Account not found"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected server failure occurred; internal details are never returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INTERNAL_ERROR",
+                                    "error": "Internal server error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/exports/messages": {
+            "post": {
+                "operationId": "createMessageExport",
+                "summary": "Create an archive message export",
+                "tags": [
+                    "exports"
+                ],
+                "description": "Reuse the background export queue to generate CSV, XLSX or JSON from an owned account/group and optional senderUid/dates/keywords. Requires api:write. Returns immediately; poll getExportJob until ready or failed, then download the artifact. This creates a file and never sends or changes archived messages. Check result.truncated before claiming full coverage.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                    "accountId",
+                                    "groupId"
+                                ],
+                                "properties": {
+                                    "accountId": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 512,
+                                        "pattern": "^[^\\u0000-\\u0020\\u007F]+$",
+                                        "description": "Owned account ID returned by group/account discovery."
+                                    },
+                                    "groupId": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 512,
+                                        "pattern": "^[^\\u0000-\\u0020\\u007F]+$",
+                                        "description": "Group ID paired with accountId in discovery results."
+                                    },
+                                    "senderUid": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 512,
+                                        "pattern": "^[^\\u0000-\\u0020\\u007F]+$",
+                                        "description": "Optional sender UID returned by member/message discovery."
+                                    },
+                                    "order": {
+                                        "type": "string",
+                                        "enum": [
+                                            "asc",
+                                            "desc"
+                                        ],
+                                        "default": "asc",
+                                        "description": "asc exports oldest-first; desc exports newest-first. Use desc with limit for the latest N matching messages."
+                                    },
+                                    "from": {
+                                        "type": "string",
+                                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                                    },
+                                    "to": {
+                                        "type": "string",
+                                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                                    },
+                                    "keyword": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 1000,
+                                        "description": "Literal content keywords separated by commas, Chinese commas, semicolons or newlines; matches any keyword. This is not the Boolean q syntax of searchMessages."
+                                    },
+                                    "format": {
+                                        "type": "string",
+                                        "enum": [
+                                            "csv",
+                                            "xlsx",
+                                            "json"
+                                        ]
+                                    },
+                                    "limit": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "maximum": 100000
+                                    },
+                                    "locale": {
+                                        "type": "string",
+                                        "enum": [
+                                            "zh-CN",
+                                            "en"
+                                        ],
+                                        "default": "zh-CN"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "aiBearer": []
+                    }
+                ],
+                "x-weibogroup-capability": "export",
+                "responses": {
+                    "202": {
+                        "description": "Documented API response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "job"
+                                    ],
+                                    "properties": {
+                                        "job": {
+                                            "type": "object",
+                                            "additionalProperties": false,
+                                            "required": [
+                                                "id",
+                                                "kind",
+                                                "accountId",
+                                                "groupId",
+                                                "format",
+                                                "status",
+                                                "createdAt",
+                                                "finishedAt",
+                                                "expiresAt",
+                                                "filename",
+                                                "contentType",
+                                                "size",
+                                                "errorCode"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                                                    "description": "Opaque export job ID returned by a create/list export operation."
+                                                },
+                                                "kind": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "messages",
+                                                        "user"
+                                                    ]
+                                                },
+                                                "accountId": {
+                                                    "type": "string"
+                                                },
+                                                "groupId": {
+                                                    "type": "string"
+                                                },
+                                                "format": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "csv",
+                                                        "xlsx",
+                                                        "json",
+                                                        "pdf",
+                                                        "zip"
+                                                    ]
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "queued",
+                                                        "running",
+                                                        "ready",
+                                                        "failed"
+                                                    ]
+                                                },
+                                                "createdAt": {
+                                                    "type": "integer",
+                                                    "description": "Unix epoch milliseconds."
+                                                },
+                                                "finishedAt": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "Unix epoch milliseconds, or null before completion."
+                                                },
+                                                "expiresAt": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "Unix epoch milliseconds, or null before completion."
+                                                },
+                                                "filename": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "contentType": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "size": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "errorCode": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "result": {
+                                                    "type": "object",
+                                                    "additionalProperties": false,
+                                                    "required": [
+                                                        "messageCount",
+                                                        "truncated"
+                                                    ],
+                                                    "description": "Coverage of the generated artifact. Absent on legacy jobs; do not infer complete coverage from missing metadata.",
+                                                    "properties": {
+                                                        "messageCount": {
+                                                            "type": "integer",
+                                                            "minimum": 0
+                                                        },
+                                                        "truncated": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "rowLimit": {
+                                                            "type": "integer",
+                                                            "minimum": 1
+                                                        },
+                                                        "assetCount": {
+                                                            "type": "integer",
+                                                            "minimum": 0
+                                                        },
+                                                        "failedAssetCount": {
+                                                            "type": "integer",
+                                                            "minimum": 0
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "job": {
+                                        "id": "12345678-1234-1234-1234-123456789abc",
+                                        "kind": "messages",
+                                        "accountId": "account-id",
+                                        "groupId": "group-id",
+                                        "format": "csv",
+                                        "status": "queued",
+                                        "createdAt": 1783166400000,
+                                        "finishedAt": null,
+                                        "expiresAt": null,
+                                        "filename": null,
+                                        "contentType": null,
+                                        "size": null,
+                                        "errorCode": null
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The request schema or filter combination is invalid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_REQUEST",
+                                    "error": "Request validation failed"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_API_TOKEN",
+                                    "error": "The API token is invalid"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The API token does not have the api:write scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "API_TOKEN_SCOPE_REQUIRED",
+                                    "error": "The API token requires the api:write scope"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The requested account/group is unknown or belongs to another user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "GROUP_NOT_FOUND",
+                                    "error": "Group not found"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "The existing shared export queue or owner quota is full.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "EXPORT_QUEUE_FULL",
+                                    "error": "Export queue is full"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected server failure occurred; internal details are never returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INTERNAL_ERROR",
+                                    "error": "Internal server error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/exports/user": {
+            "post": {
+                "operationId": "createUserExport",
+                "summary": "Create a sender PDF or ZIP export",
+                "tags": [
+                    "exports"
+                ],
+                "description": "Generate a sender PDF or Markdown/images ZIP through the existing owner-scoped background renderer. This personal-reading export uses the admin renderer's rules to omit recognized system/platform notices; use CSV/XLSX/JSON message export for raw message-kind records. Requires api:write. Use discovered accountId/groupId/senderUid and dates. Poll getExportJob, then download; inspect truncated and failedAssetCount. It never sends messages or changes the archive.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                    "accountId",
+                                    "groupId",
+                                    "senderUid"
+                                ],
+                                "properties": {
+                                    "accountId": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 512,
+                                        "pattern": "^[^\\u0000-\\u0020\\u007F]+$"
+                                    },
+                                    "groupId": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 512,
+                                        "pattern": "^[^\\u0000-\\u0020\\u007F]+$"
+                                    },
+                                    "senderUid": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 512,
+                                        "pattern": "^[^\\u0000-\\u0020\\u007F]+$"
+                                    },
+                                    "from": {
+                                        "type": "string",
+                                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                                    },
+                                    "to": {
+                                        "type": "string",
+                                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                                    },
+                                    "format": {
+                                        "type": "string",
+                                        "enum": [
+                                            "pdf",
+                                            "zip"
+                                        ],
+                                        "default": "zip"
+                                    },
+                                    "locale": {
+                                        "type": "string",
+                                        "enum": [
+                                            "zh-CN",
+                                            "en"
+                                        ],
+                                        "default": "zh-CN"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "aiBearer": []
+                    }
+                ],
+                "x-weibogroup-capability": "export",
+                "responses": {
+                    "202": {
+                        "description": "Documented API response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "job"
+                                    ],
+                                    "properties": {
+                                        "job": {
+                                            "type": "object",
+                                            "additionalProperties": false,
+                                            "required": [
+                                                "id",
+                                                "kind",
+                                                "accountId",
+                                                "groupId",
+                                                "format",
+                                                "status",
+                                                "createdAt",
+                                                "finishedAt",
+                                                "expiresAt",
+                                                "filename",
+                                                "contentType",
+                                                "size",
+                                                "errorCode"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                                                    "description": "Opaque export job ID returned by a create/list export operation."
+                                                },
+                                                "kind": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "messages",
+                                                        "user"
+                                                    ]
+                                                },
+                                                "accountId": {
+                                                    "type": "string"
+                                                },
+                                                "groupId": {
+                                                    "type": "string"
+                                                },
+                                                "format": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "csv",
+                                                        "xlsx",
+                                                        "json",
+                                                        "pdf",
+                                                        "zip"
+                                                    ]
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "queued",
+                                                        "running",
+                                                        "ready",
+                                                        "failed"
+                                                    ]
+                                                },
+                                                "createdAt": {
+                                                    "type": "integer",
+                                                    "description": "Unix epoch milliseconds."
+                                                },
+                                                "finishedAt": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "Unix epoch milliseconds, or null before completion."
+                                                },
+                                                "expiresAt": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "Unix epoch milliseconds, or null before completion."
+                                                },
+                                                "filename": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "contentType": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "size": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "errorCode": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "result": {
+                                                    "type": "object",
+                                                    "additionalProperties": false,
+                                                    "required": [
+                                                        "messageCount",
+                                                        "truncated"
+                                                    ],
+                                                    "description": "Coverage of the generated artifact. Absent on legacy jobs; do not infer complete coverage from missing metadata.",
+                                                    "properties": {
+                                                        "messageCount": {
+                                                            "type": "integer",
+                                                            "minimum": 0
+                                                        },
+                                                        "truncated": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "rowLimit": {
+                                                            "type": "integer",
+                                                            "minimum": 1
+                                                        },
+                                                        "assetCount": {
+                                                            "type": "integer",
+                                                            "minimum": 0
+                                                        },
+                                                        "failedAssetCount": {
+                                                            "type": "integer",
+                                                            "minimum": 0
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "job": {
+                                        "id": "12345678-1234-1234-1234-123456789abc",
+                                        "kind": "user",
+                                        "accountId": "account-id",
+                                        "groupId": "group-id",
+                                        "format": "zip",
+                                        "status": "queued",
+                                        "createdAt": 1783166400000,
+                                        "finishedAt": null,
+                                        "expiresAt": null,
+                                        "filename": null,
+                                        "contentType": null,
+                                        "size": null,
+                                        "errorCode": null
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The request schema or filter combination is invalid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_REQUEST",
+                                    "error": "Request validation failed"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_API_TOKEN",
+                                    "error": "The API token is invalid"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The API token does not have the api:write scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "API_TOKEN_SCOPE_REQUIRED",
+                                    "error": "The API token requires the api:write scope"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The requested account/group is unknown or belongs to another user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "GROUP_NOT_FOUND",
+                                    "error": "Group not found"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "The existing shared export queue or owner quota is full.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "EXPORT_QUEUE_FULL",
+                                    "error": "Export queue is full"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected server failure occurred; internal details are never returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INTERNAL_ERROR",
+                                    "error": "Internal server error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/exports": {
+            "get": {
+                "operationId": "listExportJobs",
+                "summary": "List owned export jobs",
+                "tags": [
+                    "exports"
+                ],
+                "description": "Lists the signed-in Token owner's unexpired jobs from the shared admin/API export queue. A user can see their UI-created and API-created jobs here; never retry an uncertain create blindly.",
+                "security": [
+                    {
+                        "aiBearer": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful list owned export jobs response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "jobs"
+                                    ],
+                                    "properties": {
+                                        "jobs": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "additionalProperties": false,
+                                                "required": [
+                                                    "id",
+                                                    "kind",
+                                                    "accountId",
+                                                    "groupId",
+                                                    "format",
+                                                    "status",
+                                                    "createdAt",
+                                                    "finishedAt",
+                                                    "expiresAt",
+                                                    "filename",
+                                                    "contentType",
+                                                    "size",
+                                                    "errorCode"
+                                                ],
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                                                        "description": "Opaque export job ID returned by a create/list export operation."
+                                                    },
+                                                    "kind": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "messages",
+                                                            "user"
+                                                        ]
+                                                    },
+                                                    "accountId": {
+                                                        "type": "string"
+                                                    },
+                                                    "groupId": {
+                                                        "type": "string"
+                                                    },
+                                                    "format": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "csv",
+                                                            "xlsx",
+                                                            "json",
+                                                            "pdf",
+                                                            "zip"
+                                                        ]
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "queued",
+                                                            "running",
+                                                            "ready",
+                                                            "failed"
+                                                        ]
+                                                    },
+                                                    "createdAt": {
+                                                        "type": "integer",
+                                                        "description": "Unix epoch milliseconds."
+                                                    },
+                                                    "finishedAt": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "integer"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ],
+                                                        "description": "Unix epoch milliseconds, or null before completion."
+                                                    },
+                                                    "expiresAt": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "integer"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ],
+                                                        "description": "Unix epoch milliseconds, or null before completion."
+                                                    },
+                                                    "filename": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "contentType": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "size": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "integer"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "errorCode": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "result": {
+                                                        "type": "object",
+                                                        "additionalProperties": false,
+                                                        "required": [
+                                                            "messageCount",
+                                                            "truncated"
+                                                        ],
+                                                        "description": "Coverage of the generated artifact. Absent on legacy jobs; do not infer complete coverage from missing metadata.",
+                                                        "properties": {
+                                                            "messageCount": {
+                                                                "type": "integer",
+                                                                "minimum": 0
+                                                            },
+                                                            "truncated": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "rowLimit": {
+                                                                "type": "integer",
+                                                                "minimum": 1
+                                                            },
+                                                            "assetCount": {
+                                                                "type": "integer",
+                                                                "minimum": 0
+                                                            },
+                                                            "failedAssetCount": {
+                                                                "type": "integer",
+                                                                "minimum": 0
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "jobs": [
+                                        {
+                                            "id": "12345678-1234-1234-1234-123456789abc",
+                                            "kind": "messages",
+                                            "accountId": "account-id",
+                                            "groupId": "group-id",
+                                            "format": "csv",
+                                            "status": "queued",
+                                            "createdAt": 1783166400000,
+                                            "finishedAt": null,
+                                            "expiresAt": null,
+                                            "filename": null,
+                                            "contentType": null,
+                                            "size": null,
+                                            "errorCode": null
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The request schema or filter combination is invalid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_REQUEST",
+                                    "error": "Request validation failed"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_API_TOKEN",
+                                    "error": "The API token is invalid"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The API token does not have the api:read scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "API_TOKEN_SCOPE_REQUIRED",
+                                    "error": "The API token requires the api:read scope"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected server failure occurred; internal details are never returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INTERNAL_ERROR",
+                                    "error": "Internal server error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/exports/{id}": {
+            "get": {
+                "operationId": "getExportJob",
+                "summary": "Get owned export status and file metadata",
+                "tags": [
+                    "exports"
+                ],
+                "description": "Poll a returned job ID until ready or failed, with a short delay between requests. ready includes filename, contentType, size and coverage metadata. finishedAt/expiresAt use milliseconds. Foreign, unknown and expired jobs return 404.",
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                        },
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Opaque export job ID returned by a create/list export operation.",
+                        "example": "12345678-1234-1234-1234-123456789abc"
+                    }
+                ],
+                "security": [
+                    {
+                        "aiBearer": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful get owned export status and file metadata response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "job"
+                                    ],
+                                    "properties": {
+                                        "job": {
+                                            "type": "object",
+                                            "additionalProperties": false,
+                                            "required": [
+                                                "id",
+                                                "kind",
+                                                "accountId",
+                                                "groupId",
+                                                "format",
+                                                "status",
+                                                "createdAt",
+                                                "finishedAt",
+                                                "expiresAt",
+                                                "filename",
+                                                "contentType",
+                                                "size",
+                                                "errorCode"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                                                    "description": "Opaque export job ID returned by a create/list export operation."
+                                                },
+                                                "kind": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "messages",
+                                                        "user"
+                                                    ]
+                                                },
+                                                "accountId": {
+                                                    "type": "string"
+                                                },
+                                                "groupId": {
+                                                    "type": "string"
+                                                },
+                                                "format": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "csv",
+                                                        "xlsx",
+                                                        "json",
+                                                        "pdf",
+                                                        "zip"
+                                                    ]
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "queued",
+                                                        "running",
+                                                        "ready",
+                                                        "failed"
+                                                    ]
+                                                },
+                                                "createdAt": {
+                                                    "type": "integer",
+                                                    "description": "Unix epoch milliseconds."
+                                                },
+                                                "finishedAt": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "Unix epoch milliseconds, or null before completion."
+                                                },
+                                                "expiresAt": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ],
+                                                    "description": "Unix epoch milliseconds, or null before completion."
+                                                },
+                                                "filename": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "contentType": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "size": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "errorCode": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "result": {
+                                                    "type": "object",
+                                                    "additionalProperties": false,
+                                                    "required": [
+                                                        "messageCount",
+                                                        "truncated"
+                                                    ],
+                                                    "description": "Coverage of the generated artifact. Absent on legacy jobs; do not infer complete coverage from missing metadata.",
+                                                    "properties": {
+                                                        "messageCount": {
+                                                            "type": "integer",
+                                                            "minimum": 0
+                                                        },
+                                                        "truncated": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "rowLimit": {
+                                                            "type": "integer",
+                                                            "minimum": 1
+                                                        },
+                                                        "assetCount": {
+                                                            "type": "integer",
+                                                            "minimum": 0
+                                                        },
+                                                        "failedAssetCount": {
+                                                            "type": "integer",
+                                                            "minimum": 0
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "job": {
+                                        "id": "12345678-1234-1234-1234-123456789abc",
+                                        "kind": "messages",
+                                        "accountId": "account-id",
+                                        "groupId": "group-id",
+                                        "format": "csv",
+                                        "status": "queued",
+                                        "createdAt": 1783166400000,
+                                        "finishedAt": null,
+                                        "expiresAt": null,
+                                        "filename": null,
+                                        "contentType": null,
+                                        "size": null,
+                                        "errorCode": null
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The request schema or filter combination is invalid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_REQUEST",
+                                    "error": "Request validation failed"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_API_TOKEN",
+                                    "error": "The API token is invalid"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The API token does not have the api:read scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "API_TOKEN_SCOPE_REQUIRED",
+                                    "error": "The API token requires the api:read scope"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The job is unknown, expired, or owned by another user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "EXPORT_NOT_FOUND",
+                                    "error": "Export not found or expired"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected server failure occurred; internal details are never returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INTERNAL_ERROR",
+                                    "error": "Internal server error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/exports/{id}/download": {
+            "get": {
+                "operationId": "downloadExportFile",
+                "summary": "Download an owned ready export file",
+                "tags": [
+                    "exports"
+                ],
+                "description": "Binary stream authenticated with the same Bearer Token (api:read). File must be ready and unexpired. Not a JSON MCP tool; Harness uses its streaming attachment download tool. Never put the business Token in a URL.",
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                        },
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Opaque export job ID returned by a create/list export operation.",
+                        "example": "12345678-1234-1234-1234-123456789abc"
+                    }
+                ],
+                "security": [
+                    {
+                        "aiBearer": []
+                    }
+                ],
+                "x-mcp-enabled": false,
+                "responses": {
+                    "200": {
+                        "description": "Successful download an owned ready export file response.",
+                        "content": {
+                            "application/octet-stream": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The request schema or filter combination is invalid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_REQUEST",
+                                    "error": "Request validation failed"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_API_TOKEN",
+                                    "error": "The API token is invalid"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The API token does not have the api:read scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "API_TOKEN_SCOPE_REQUIRED",
+                                    "error": "The API token requires the api:read scope"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The job is unknown, expired, or owned by another user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "EXPORT_NOT_FOUND",
+                                    "error": "Export not found or expired"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "The job exists but has no ready file.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "EXPORT_NOT_READY",
+                                    "error": "The export file is not ready"
                                 }
                             }
                         }
@@ -8379,6 +10182,10 @@
         {
             "name": "market",
             "description": "Read-only stock, gold, futures and cryptocurrency quotes"
+        },
+        {
+            "name": "exports",
+            "description": "Owner-scoped background archive exports and authenticated downloads"
         }
     ]
 }

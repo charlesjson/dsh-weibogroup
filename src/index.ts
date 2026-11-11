@@ -4,7 +4,7 @@ import { createArchiveClient } from './api/client.js'
 import { registerArchiveTools } from './harness/register.js'
 
 export { Config } from './config.js'
-export { readOnlyCatalog } from './api/catalog.js'
+export { archiveToolCatalog } from './api/catalog.js'
 export const name = 'weibo-group'
 export const inject = ['tools', 'systemPrompt']
 

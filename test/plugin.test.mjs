@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Context, Service } from '@deepseek-ai/cordis'
 import { ToolRuntime } from '@deepseek-ai/dsh-tools'
-import { apply, readOnlyCatalog } from '../dist/index.js'
+import { apply, archiveToolCatalog } from '../dist/index.js'
 import { loadConnection } from '../dist/api/connection.js'
 import { authenticatedFetch } from '../dist/api/transport.js'
 import { executeMcpTool } from '../dist/vendor/http-tools.js'
@@ -15,7 +15,7 @@ const token = 'wg_ai_' + 'x'.repeat(43)
 const options = { apiBaseUrl: new URL('https://archive.example'), apiToken: token, timeoutMs: 1000, maxResponseBytes: 100000 }
 
 test('catalog excludes send/recall tools but retains POST batch reads and exact input schemas', async () => {
-  const catalog = readOnlyCatalog()
+  const catalog = archiveToolCatalog()
   assert.ok(catalog.tools.length >= 18)
   for (const name of ['sendGroupMessage', 'sendGroupImage', 'sendGroupVideo', 'recallGroupMessage']) assert.equal(catalog.operations.has(name), false)
   assert.ok(catalog.operations.has('getMessagesBatch'))
@@ -70,7 +70,7 @@ test('message pagination returns complete evidence or a resumable, explicit part
   const example = document.paths['/api/v1/messages'].get.responses['200'].content['application/json'].example
   const run = async maximum => {
     const requests = []
-    const result = await executeMcpTool(readOnlyCatalog(), 'searchMessages', { accountId: 'account-id', groupId: 'group-id', limit: 1 }, {
+    const result = await executeMcpTool(archiveToolCatalog(), 'searchMessages', { accountId: 'account-id', groupId: 'group-id', limit: 1 }, {
       ...options, maxAutoPaginatedMessages: maximum,
       fetch: async (url, init) => {
         requests.push(new URL(url))
@@ -115,7 +115,7 @@ test('real Cordis effects register native Harness definitions and dispose cleanl
   await ctx.plugin(Prompts)
   const fork = ctx.plugin({ name: 'weibo-test', inject: ['tools', 'systemPrompt'], apply: child => apply(child, { connectionFile: '/missing', timeoutMs: 1000, maxResponseBytes: 100000, maxMessages: 1000 }) })
   await fork
-  assert.equal(definitions.size, readOnlyCatalog().tools.length)
+  assert.equal(definitions.size, archiveToolCatalog().tools.length)
   assert.match(sections.get('tool:weibogroup').text({}), /领取回执金额不等于/)
   const tool = definitions.get('weibo_listAccounts')
   assert.ok(tool.output.schema)

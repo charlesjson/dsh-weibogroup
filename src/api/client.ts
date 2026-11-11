@@ -3,18 +3,21 @@ import type { Config } from '../config.js'
 import { executeMcpTool } from '../vendor/http-tools.js'
 import { loadConnection } from './connection.js'
 import { authenticatedFetch } from './transport.js'
-import { readOnlyCatalog } from './catalog.js'
+import { archiveToolCatalog } from './catalog.js'
+import { openExportDownload, type ExportDownload } from './exports.js'
 
 export interface ArchiveClient {
   readonly tools: readonly Tool[]
   call(name: string, args: Record<string, unknown>, signal: AbortSignal): Promise<CallToolResult>
+  openExport(id: string, signal: AbortSignal): Promise<ExportDownload>
 }
 
 /** Framework-independent archive access; credentials stay inside this module. */
 export function createArchiveClient(config: Config, fetchImpl?: typeof fetch): ArchiveClient {
-  const catalog = readOnlyCatalog()
+  const catalog = archiveToolCatalog()
   return {
     tools: catalog.tools,
+    openExport: (id, signal) => openExportDownload(config, catalog, id, signal, fetchImpl),
     async call(name, args, signal) {
       signal.throwIfAborted()
       const connection = await loadConnection(config.connectionFile)

@@ -296,6 +296,7 @@ function buildOperation(root, routePath, pathItem, method, operation, validatorP
         description: operationDescription(operation, operationId),
         inputSchema,
         ...(outputSchema ? { outputSchema } : {}),
+        ...(operation['x-weibogroup-capability'] === 'export' ? { _meta: { 'weibogroup/capability': 'export' } } : {}),
         annotations: {
             ...(summary ? { title: summary } : {}),
             readOnlyHint: !isWrite,

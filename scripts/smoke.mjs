@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict'
-import { readOnlyCatalog } from '../dist/index.js'
+import { archiveToolCatalog } from '../dist/index.js'
 import { loadConnection } from '../dist/api/connection.js'
 import { authenticatedFetch } from '../dist/api/transport.js'
 import { executeMcpTool } from '../dist/vendor/http-tools.js'
 
 const connection = await loadConnection()
-const catalog = readOnlyCatalog()
+const catalog = archiveToolCatalog()
 const options = { apiBaseUrl: connection.baseUrl, apiToken: connection.apiToken, timeoutMs: 30000, maxResponseBytes: 4194304,
   maxAutoPaginatedMessages: 100, fetch: authenticatedFetch(connection.baseUrl, new AbortController().signal) }
 const call = async (name, args) => {

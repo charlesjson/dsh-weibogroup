@@ -6,10 +6,10 @@
 - “找出阿尼亚的 UID，总结她上个月关于 AI 的发言，附原文链接。”
 - “统计阿尼亚发出的红包，按年月画条形图。发送条数和可见领取金额分别展示。”
 
-提供 18 个原生工具（`weibo_` 前缀）：账号与群发现、成员与资料查询、
+标准 Harness 提供 23 个原生工具（`weibo_` 前缀，含查询、导出任务和附件下载）：账号与群发现、成员与资料查询、
 消息搜索/批量读取/上下文/窗口、时间线、发言与关键词统计、词云、市场报价。
 自然语言理解和回答由 Harness 当前选择的模型完成，不需要再配置一套模型。
-不注册发送、上传和撤回工具。已验证命令行 Harness **0.2.0-rc.2** 和桌面版 **0.2.2-rc.1** 的工具接口。
+支持复用后台生成 CSV/XLSX/JSON、单人 PDF/ZIP，并以原生文件附件交付。微博发送、图片/视频上传和撤回工具继续不注册。已验证命令行 Harness **0.2.0-rc.2** 和桌面版 **0.2.2-rc.1** 的工具接口。
 
 ## 安装
 
@@ -17,20 +17,20 @@
 npm ci --ignore-scripts
 npm test
 npm pack
-dsh plugin --profile web add /srv/data/code/dshplugin/dsh-weibogroup/dsh-weibogroup-0.2.1.tgz
+dsh plugin --profile web add /srv/data/code/dshplugin/dsh-weibogroup/dsh-weibogroup-0.3.0.tgz
 ```
 
 桌面版在插件页安装同一安装包：
 
 ```text
-file:/srv/data/code/dshplugin/dsh-weibogroup/dsh-weibogroup-0.2.1.tgz
+file:/srv/data/code/dshplugin/dsh-weibogroup/dsh-weibogroup-0.3.0.tgz
 ```
 
 安装后重启对应 Harness 实例。禁用或卸载插件后，工具和问答指引自动撤回。
 
 ## 连接配置
 
-在微博群聊管理后台的 AI API Tokens 页面创建独立的 **api:read** Token。
+在微博群聊管理后台的 AI API Tokens 页面创建独立 Token：查询/下载需要 **api:read**，创建导出还需要 **api:write**。
 默认读取运行 Harness 的操作系统用户的
 `~/.config/dsh-weibogroup/connection.json`：
 
@@ -57,6 +57,21 @@ Token 每次调用时读取，轮换后无需重新打包。安装包不含网�
 `/api/docs/json`，业务接口仍要求 Bearer Token。客户端仍须连通微服虚拟网络。
 对应 WeiboGroup 1.0.23 已包含这些路径设置。
 
+## 复用后台导出
+
+可以直接提问“把 tt 群最近三天消息导出成 Excel”或“把某成员上周的发言导出成 PDF”。
+
+1. `weibo_createMessageExport`：CSV、XLSX、JSON，支持日期、关键词及可选 senderUid/order（默认正序；最近N条用order=desc配合limit）；关键词按逗号/分号/换行分隔，匹配任一字面关键词，不是搜索接口的 Boolean q 语法。
+2. `weibo_createUserExport`：指定成员的 PDF 或 Markdown+图片 ZIP，保留后台个人阅读版的系统/平台提示过滤口径；CSV/XLSX/JSON 则保留 messageKind 原始分类。
+3. 用 `weibo_getExportJob` 查询返回的任务 ID，等待 `ready`；失败时查看 errorCode。
+4. `weibo_downloadExport` 流式下载并存入 Harness 原生附件，聊天中可以点击文件下载。Token 不进入模型参数/下载链接，文件内容不通过 base64 填入上下文。
+
+这些操作与后台共用同一个 ExportService、任务队列、渲染器、配额、7天保留期及文件；后台创建的任务也能在插件中查询。导出只生成派生文件，原始归档消息保持原样。
+
+`result.messageCount/rowLimit/truncated/failedAssetCount` 说明覆盖范围；下载结果会再次提示截断及附件失败。旧任务缺少统计信息时提示覆盖范围未知。创建任务是写操作，需要写权限；list/status/download 使用读权限。
+
+下载默认上限64 MiB、120秒，可配置 `maxExportBytes`（最大512 MiB）及 `exportTimeoutMs`（最大10分钟）。附件存储服务存在时启用下载工具；标准桌面/web/headless profile 均提供该服务。自定义精简 profile 应挂载 `attachments` 能力。
+
 ## 统计口径
 
 Harness 普通消息搜索只读取请求的一页，`limit=10` 最多返回10条；找群可以用 `listGroups(q=群名)`，找人可以用 `listGroupMembers(q=昵称,limit=20)`，无需下载整份名单。结果明确返回
@@ -76,7 +91,7 @@ Harness 普通消息搜索只读取请求的一页，`limit=10` 最多返回10�
 | --- | --- |
 | `src/index.ts` | Cordis 插件入口与组合 |
 | `src/config.ts` | 配置 schema、默认值与边界校验 |
-| `src/api/client.ts` | 与 Harness 无关的归档客户端；统一鉴权、取消及返回预算 |
+| `src/api/client.ts`、`exports.ts` | 与 Harness 无关的归档客户端及有界文件流；统一鉴权、取消及返回预算 |
 | `src/api/connection.ts`、`transport.ts` | 凭据文件、HTTPS、来源限制与重定向保护 |
 | `src/api/catalog.ts` | 从 OpenAPI 发现只读操作 |
 | `src/harness/` | 工具注册、生命周期、展示及通用问答指引 |

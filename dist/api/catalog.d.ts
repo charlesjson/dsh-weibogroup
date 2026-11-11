@@ -1,5 +1,5 @@
 /** Operation discovery and side-effect policy come from the API contract. */
-export declare function readOnlyCatalog(): {
+export declare function archiveToolCatalog(): {
     operations: Map<string, import("../vendor/openapi-tools.js").McpToolOperation>;
     tools: {
         inputSchema: {
