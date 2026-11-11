@@ -1,7 +1,7 @@
 {
   "name": "dsh-weibogroup",
-  "version": "0.3.0",
-  "description": "DeepSeek Harness 微博群聊自然语言问答和后台导出",
+  "version": "0.4.0",
+  "description": "DeepSeek Harness 微博群聊问答、后台导出和关键词监控",
   "type": "module",
   "license": "ISC",
   "main": "./dist/index.js",

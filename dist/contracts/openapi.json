@@ -2,8 +2,8 @@
     "openapi": "3.0.3",
     "info": {
         "title": "Weibo Group AI API",
-        "description": "Versioned API for querying archived Weibo group messages, users, groups and analytics, plus background archive exports and sending text and image messages to owned groups. Use stable operationId values as AI tool names or expose them through the bundled MCP stdio adapter. Send API tokens as Bearer credentials; message-send operations require the api:write token scope.",
-        "version": "1.3.0"
+        "description": "Versioned API for querying archived Weibo group messages, users, groups and analytics, plus background archive exports, existing keyword/sender monitors and notification outcomes, and sending text and image messages to owned groups. Use stable operationId values as AI tool names or expose them through the bundled MCP stdio adapter. Send API tokens as Bearer credentials; message-send operations require the api:write token scope.",
+        "version": "1.4.0"
     },
     "components": {
         "securitySchemes": {
@@ -10146,6 +10146,3096 @@
                     }
                 }
             }
+        },
+        "/api/v1/notification-targets": {
+            "get": {
+                "operationId": "listNotificationTargets",
+                "summary": "Discover owned notification targets",
+                "tags": [
+                    "monitor"
+                ],
+                "description": "Lists existing owned Telegram/Discord targets without Bot credentials. Discover IDs before creating a monitor rule. enabled reflects the target switch; it is not a guarantee of channel health.",
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "default": 20
+                        },
+                        "in": "query",
+                        "name": "limit",
+                        "required": false,
+                        "description": "Maximum records on this page.",
+                        "example": 20
+                    },
+                    {
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 10000,
+                            "default": 0
+                        },
+                        "in": "query",
+                        "name": "offset",
+                        "required": false,
+                        "description": "Use the returned nextOffset with the same filters; bounded to 10000.",
+                        "example": 0
+                    },
+                    {
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "telegram",
+                                "discord"
+                            ]
+                        },
+                        "in": "query",
+                        "name": "platform",
+                        "required": false,
+                        "description": "Notification platform of the existing targets and rule.",
+                        "example": "telegram"
+                    },
+                    {
+                        "schema": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 512,
+                            "pattern": "\\S"
+                        },
+                        "in": "query",
+                        "name": "q",
+                        "required": false,
+                        "description": "Filter target name, username or chat ID.",
+                        "example": "Example"
+                    },
+                    {
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "0",
+                                "1"
+                            ]
+                        },
+                        "in": "query",
+                        "name": "enabled",
+                        "required": false,
+                        "description": "Filter target switch: 1 enabled, 0 disabled.",
+                        "example": "1"
+                    }
+                ],
+                "security": [
+                    {
+                        "aiBearer": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful discover owned notification targets response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "targets",
+                                        "pagination"
+                                    ],
+                                    "properties": {
+                                        "targets": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "additionalProperties": false,
+                                                "required": [
+                                                    "id",
+                                                    "platform",
+                                                    "channelConfigId",
+                                                    "chatId",
+                                                    "displayName",
+                                                    "username",
+                                                    "enabled"
+                                                ],
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "minimum": 1,
+                                                        "maximum": 2147483647
+                                                    },
+                                                    "platform": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "telegram",
+                                                            "discord"
+                                                        ],
+                                                        "description": "Notification platform of the existing targets and rule."
+                                                    },
+                                                    "channelConfigId": {
+                                                        "type": "integer",
+                                                        "minimum": 1,
+                                                        "maximum": 2147483647
+                                                    },
+                                                    "chatId": {
+                                                        "type": "string"
+                                                    },
+                                                    "displayName": {
+                                                        "type": "string"
+                                                    },
+                                                    "username": {
+                                                        "type": "string"
+                                                    },
+                                                    "enabled": {
+                                                        "type": "integer",
+                                                        "enum": [
+                                                            0,
+                                                            1
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "pagination": {
+                                            "type": "object",
+                                            "additionalProperties": false,
+                                            "required": [
+                                                "nextOffset",
+                                                "truncated"
+                                            ],
+                                            "properties": {
+                                                "nextOffset": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "truncated": {
+                                                    "type": "boolean",
+                                                    "description": "More records exist beyond this page. At the offset cap, narrow the filters."
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "targets": [],
+                                    "pagination": {
+                                        "nextOffset": null,
+                                        "truncated": false
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The request schema or filter combination is invalid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_REQUEST",
+                                    "error": "Request validation failed"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_API_TOKEN",
+                                    "error": "The API token is invalid"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The API token does not have the api:read scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "API_TOKEN_SCOPE_REQUIRED",
+                                    "error": "The API token requires the api:read scope"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected server failure occurred; internal details are never returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INTERNAL_ERROR",
+                                    "error": "Internal server error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/monitor-rules": {
+            "get": {
+                "operationId": "listMonitorRules",
+                "summary": "List owned keyword and sender monitors",
+                "tags": [
+                    "monitor"
+                ],
+                "description": "Lists the same rules and destinations used by the management UI. Keywords are ORed, sender UIDs are ORed, and these two sets are ANDed. Read full destinations before editing shared rules.",
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "default": 20
+                        },
+                        "in": "query",
+                        "name": "limit",
+                        "required": false,
+                        "description": "Maximum records on this page.",
+                        "example": 20
+                    },
+                    {
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 10000,
+                            "default": 0
+                        },
+                        "in": "query",
+                        "name": "offset",
+                        "required": false,
+                        "description": "Use the returned nextOffset with the same filters; bounded to 10000.",
+                        "example": 0
+                    },
+                    {
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "telegram",
+                                "discord"
+                            ]
+                        },
+                        "in": "query",
+                        "name": "platform",
+                        "required": false,
+                        "description": "Notification platform of the existing targets and rule.",
+                        "example": "telegram"
+                    },
+                    {
+                        "schema": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 512,
+                            "pattern": "\\S"
+                        },
+                        "in": "query",
+                        "name": "q",
+                        "required": false,
+                        "description": "Filter rule name, keyword list or target chat ID.",
+                        "example": "Example"
+                    },
+                    {
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "0",
+                                "1"
+                            ]
+                        },
+                        "in": "query",
+                        "name": "enabled",
+                        "required": false,
+                        "description": "Filter rule switch: 1 enabled, 0 disabled.",
+                        "example": "1"
+                    }
+                ],
+                "security": [
+                    {
+                        "aiBearer": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful list owned keyword and sender monitors response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "rules",
+                                        "pagination"
+                                    ],
+                                    "properties": {
+                                        "rules": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "additionalProperties": false,
+                                                "required": [
+                                                    "id",
+                                                    "platform",
+                                                    "name",
+                                                    "keywords",
+                                                    "matchType",
+                                                    "sourceAccounts",
+                                                    "sourceGroups",
+                                                    "sourceSenderUids",
+                                                    "sourceSenderNames",
+                                                    "ingestSources",
+                                                    "enabled",
+                                                    "destinations",
+                                                    "createdAt",
+                                                    "updatedAt",
+                                                    "hitCount"
+                                                ],
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "minimum": 1,
+                                                        "maximum": 2147483647
+                                                    },
+                                                    "platform": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "telegram",
+                                                            "discord"
+                                                        ],
+                                                        "description": "Notification platform of the existing targets and rule."
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "keywords": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "matchType": {
+                                                        "type": "string"
+                                                    },
+                                                    "sourceAccounts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "sourceGroups": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "sourceSenderUids": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "sourceSenderNames": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "ingestSources": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "enabled": {
+                                                        "type": "integer",
+                                                        "enum": [
+                                                            0,
+                                                            1
+                                                        ]
+                                                    },
+                                                    "destinations": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "additionalProperties": false,
+                                                            "required": [
+                                                                "id",
+                                                                "targetId",
+                                                                "platform",
+                                                                "channelConfigId",
+                                                                "targetChat",
+                                                                "targetEnabled",
+                                                                "enabled",
+                                                                "template",
+                                                                "pushStrategy"
+                                                            ],
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "minimum": 1,
+                                                                    "maximum": 2147483647
+                                                                },
+                                                                "targetId": {
+                                                                    "type": "integer",
+                                                                    "minimum": 1,
+                                                                    "maximum": 2147483647
+                                                                },
+                                                                "platform": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "telegram",
+                                                                        "discord"
+                                                                    ],
+                                                                    "description": "Notification platform of the existing targets and rule."
+                                                                },
+                                                                "channelConfigId": {
+                                                                    "type": "integer",
+                                                                    "minimum": 1,
+                                                                    "maximum": 2147483647
+                                                                },
+                                                                "targetChat": {
+                                                                    "type": "string"
+                                                                },
+                                                                "targetEnabled": {
+                                                                    "type": "integer",
+                                                                    "enum": [
+                                                                        0,
+                                                                        1
+                                                                    ]
+                                                                },
+                                                                "enabled": {
+                                                                    "type": "integer",
+                                                                    "enum": [
+                                                                        0,
+                                                                        1
+                                                                    ]
+                                                                },
+                                                                "template": {
+                                                                    "type": "string"
+                                                                },
+                                                                "pushStrategy": {
+                                                                    "type": "object",
+                                                                    "additionalProperties": true
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "createdAt": {
+                                                        "type": "integer"
+                                                    },
+                                                    "updatedAt": {
+                                                        "type": "integer"
+                                                    },
+                                                    "hitCount": {
+                                                        "type": "integer",
+                                                        "description": "Stored rule/message/keyword hit rows, not unique message count or successful notification count."
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "pagination": {
+                                            "type": "object",
+                                            "additionalProperties": false,
+                                            "required": [
+                                                "nextOffset",
+                                                "truncated"
+                                            ],
+                                            "properties": {
+                                                "nextOffset": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "truncated": {
+                                                    "type": "boolean",
+                                                    "description": "More records exist beyond this page. At the offset cap, narrow the filters."
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "rules": [
+                                        {
+                                            "id": 1,
+                                            "platform": "telegram",
+                                            "name": "Example watch",
+                                            "keywords": [
+                                                "故障"
+                                            ],
+                                            "matchType": "contains",
+                                            "sourceAccounts": [
+                                                "account-id"
+                                            ],
+                                            "sourceGroups": [
+                                                "group-id"
+                                            ],
+                                            "sourceSenderUids": [],
+                                            "sourceSenderNames": [],
+                                            "ingestSources": [
+                                                "realtime",
+                                                "latest-poll"
+                                            ],
+                                            "enabled": 0,
+                                            "destinations": [
+                                                {
+                                                    "id": 1,
+                                                    "targetId": 1,
+                                                    "platform": "telegram",
+                                                    "channelConfigId": 1,
+                                                    "targetChat": "-1000000000000",
+                                                    "targetEnabled": 1,
+                                                    "enabled": 1,
+                                                    "template": "",
+                                                    "pushStrategy": {}
+                                                }
+                                            ],
+                                            "createdAt": 1794355200,
+                                            "updatedAt": 1794355200,
+                                            "hitCount": 0
+                                        }
+                                    ],
+                                    "pagination": {
+                                        "nextOffset": null,
+                                        "truncated": false
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The request schema or filter combination is invalid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_REQUEST",
+                                    "error": "Request validation failed"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_API_TOKEN",
+                                    "error": "The API token is invalid"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The API token does not have the api:read scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "API_TOKEN_SCOPE_REQUIRED",
+                                    "error": "The API token requires the api:read scope"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected server failure occurred; internal details are never returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INTERNAL_ERROR",
+                                    "error": "Internal server error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "createMonitorRule",
+                "summary": "Create a keyword or sender monitor",
+                "tags": [
+                    "monitor"
+                ],
+                "description": "Creates a rule in the existing background matcher and notification queue. Requires api:write. Set platform and discover owned target IDs. Supply keywords, sender UIDs or both. enabled defaults to true. Enabled rules may send future matching notifications. Existing history is not replayed. No archive messages are changed. Do not blindly retry an uncertain create; query rules first.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                    "platform",
+                                    "destinations"
+                                ],
+                                "properties": {
+                                    "platform": {
+                                        "type": "string",
+                                        "enum": [
+                                            "telegram",
+                                            "discord"
+                                        ],
+                                        "description": "Notification platform of the existing targets and rule."
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 200
+                                    },
+                                    "keywords": {
+                                        "type": "array",
+                                        "maxItems": 100,
+                                        "uniqueItems": true,
+                                        "items": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 512,
+                                            "pattern": "\\S"
+                                        },
+                                        "description": "Literal keywords ORed together; not the Boolean q search syntax. Empty is allowed for sender-only rules."
+                                    },
+                                    "matchType": {
+                                        "type": "string",
+                                        "enum": [
+                                            "contains",
+                                            "exact",
+                                            "regex"
+                                        ],
+                                        "description": "Existing case-insensitive matcher: substring, trimmed whole content, or regex (maximum 200 characters per pattern)."
+                                    },
+                                    "sourceAccounts": {
+                                        "type": "array",
+                                        "maxItems": 100,
+                                        "uniqueItems": true,
+                                        "items": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 512,
+                                            "pattern": "\\S"
+                                        },
+                                        "description": "Owned source account IDs. Empty means all owned accounts."
+                                    },
+                                    "sourceGroups": {
+                                        "type": "array",
+                                        "maxItems": 100,
+                                        "uniqueItems": true,
+                                        "items": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 512,
+                                            "pattern": "\\S"
+                                        },
+                                        "description": "Group IDs filtered within the selected source accounts; empty means all their groups. Account and group filters are independent AND conditions."
+                                    },
+                                    "sourceSenderUids": {
+                                        "type": "array",
+                                        "maxItems": 100,
+                                        "uniqueItems": true,
+                                        "items": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 512,
+                                            "pattern": "\\S"
+                                        },
+                                        "description": "Stable sender UIDs, ORed together. If keywords are also set, sender and keyword conditions are ANDed."
+                                    },
+                                    "ingestSources": {
+                                        "type": "array",
+                                        "minItems": 1,
+                                        "maxItems": 8,
+                                        "uniqueItems": true,
+                                        "items": {
+                                            "type": "string",
+                                            "enum": [
+                                                "realtime",
+                                                "latest-poll",
+                                                "startup",
+                                                "catchup",
+                                                "backfill",
+                                                "manual-history",
+                                                "viewer-sync",
+                                                "viewer-older"
+                                            ]
+                                        },
+                                        "description": "Defaults to realtime/latest-poll. Selecting backfill sources changes which newly ingested events are eligible; it does not replay already processed history."
+                                    },
+                                    "enabled": {
+                                        "type": "boolean"
+                                    },
+                                    "destinations": {
+                                        "type": "array",
+                                        "minItems": 1,
+                                        "maxItems": 100,
+                                        "items": {
+                                            "type": "object",
+                                            "additionalProperties": false,
+                                            "required": [
+                                                "targetId"
+                                            ],
+                                            "properties": {
+                                                "targetId": {
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "maximum": 2147483647,
+                                                    "description": "Owned target ID discovered with listNotificationTargets; never guess a chat ID."
+                                                },
+                                                "template": {
+                                                    "type": "string",
+                                                    "maxLength": 4000
+                                                },
+                                                "pushStrategy": {
+                                                    "type": "object",
+                                                    "additionalProperties": false,
+                                                    "properties": {
+                                                        "throttleSec": {
+                                                            "type": "integer",
+                                                            "minimum": 0,
+                                                            "maximum": 86400
+                                                        },
+                                                        "maxPerHour": {
+                                                            "type": "integer",
+                                                            "minimum": 0,
+                                                            "maximum": 10000
+                                                        },
+                                                        "silentFrom": {
+                                                            "type": "string",
+                                                            "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+                                                        },
+                                                        "silentTo": {
+                                                            "type": "string",
+                                                            "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+                                                        }
+                                                    }
+                                                },
+                                                "enabled": {
+                                                    "type": "boolean"
+                                                }
+                                            }
+                                        },
+                                        "description": "Complete destination list. PATCH replaces this list; preserve existing entries when changing one route. Each destination has independent delivery settings."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "aiBearer": []
+                    }
+                ],
+                "x-weibogroup-capability": "monitor",
+                "responses": {
+                    "201": {
+                        "description": "Documented API response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "rule"
+                                    ],
+                                    "properties": {
+                                        "rule": {
+                                            "type": "object",
+                                            "additionalProperties": false,
+                                            "required": [
+                                                "id",
+                                                "platform",
+                                                "name",
+                                                "keywords",
+                                                "matchType",
+                                                "sourceAccounts",
+                                                "sourceGroups",
+                                                "sourceSenderUids",
+                                                "sourceSenderNames",
+                                                "ingestSources",
+                                                "enabled",
+                                                "destinations",
+                                                "createdAt",
+                                                "updatedAt",
+                                                "hitCount"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "maximum": 2147483647
+                                                },
+                                                "platform": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "telegram",
+                                                        "discord"
+                                                    ],
+                                                    "description": "Notification platform of the existing targets and rule."
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "keywords": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "matchType": {
+                                                    "type": "string"
+                                                },
+                                                "sourceAccounts": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "sourceGroups": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "sourceSenderUids": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "sourceSenderNames": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "ingestSources": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "enabled": {
+                                                    "type": "integer",
+                                                    "enum": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                "destinations": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "additionalProperties": false,
+                                                        "required": [
+                                                            "id",
+                                                            "targetId",
+                                                            "platform",
+                                                            "channelConfigId",
+                                                            "targetChat",
+                                                            "targetEnabled",
+                                                            "enabled",
+                                                            "template",
+                                                            "pushStrategy"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "minimum": 1,
+                                                                "maximum": 2147483647
+                                                            },
+                                                            "targetId": {
+                                                                "type": "integer",
+                                                                "minimum": 1,
+                                                                "maximum": 2147483647
+                                                            },
+                                                            "platform": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "telegram",
+                                                                    "discord"
+                                                                ],
+                                                                "description": "Notification platform of the existing targets and rule."
+                                                            },
+                                                            "channelConfigId": {
+                                                                "type": "integer",
+                                                                "minimum": 1,
+                                                                "maximum": 2147483647
+                                                            },
+                                                            "targetChat": {
+                                                                "type": "string"
+                                                            },
+                                                            "targetEnabled": {
+                                                                "type": "integer",
+                                                                "enum": [
+                                                                    0,
+                                                                    1
+                                                                ]
+                                                            },
+                                                            "enabled": {
+                                                                "type": "integer",
+                                                                "enum": [
+                                                                    0,
+                                                                    1
+                                                                ]
+                                                            },
+                                                            "template": {
+                                                                "type": "string"
+                                                            },
+                                                            "pushStrategy": {
+                                                                "type": "object",
+                                                                "additionalProperties": true
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "createdAt": {
+                                                    "type": "integer"
+                                                },
+                                                "updatedAt": {
+                                                    "type": "integer"
+                                                },
+                                                "hitCount": {
+                                                    "type": "integer",
+                                                    "description": "Stored rule/message/keyword hit rows, not unique message count or successful notification count."
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "rule": {
+                                        "id": 1,
+                                        "platform": "telegram",
+                                        "name": "Example watch",
+                                        "keywords": [
+                                            "故障"
+                                        ],
+                                        "matchType": "contains",
+                                        "sourceAccounts": [
+                                            "account-id"
+                                        ],
+                                        "sourceGroups": [
+                                            "group-id"
+                                        ],
+                                        "sourceSenderUids": [],
+                                        "sourceSenderNames": [],
+                                        "ingestSources": [
+                                            "realtime",
+                                            "latest-poll"
+                                        ],
+                                        "enabled": 0,
+                                        "destinations": [
+                                            {
+                                                "id": 1,
+                                                "targetId": 1,
+                                                "platform": "telegram",
+                                                "channelConfigId": 1,
+                                                "targetChat": "-1000000000000",
+                                                "targetEnabled": 1,
+                                                "enabled": 1,
+                                                "template": "",
+                                                "pushStrategy": {}
+                                            }
+                                        ],
+                                        "createdAt": 1794355200,
+                                        "updatedAt": 1794355200,
+                                        "hitCount": 0
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The request schema or filter combination is invalid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_REQUEST",
+                                    "error": "Request validation failed"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_API_TOKEN",
+                                    "error": "The API token is invalid"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The API token does not have the api:write scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "API_TOKEN_SCOPE_REQUIRED",
+                                    "error": "The API token requires the api:write scope"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Unknown rule or one belonging to another owner.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "RULE_NOT_FOUND",
+                                    "error": "Monitor rule not found"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected server failure occurred; internal details are never returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INTERNAL_ERROR",
+                                    "error": "Internal server error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/monitor-rules/{id}": {
+            "get": {
+                "operationId": "getMonitorRule",
+                "summary": "Get an owned monitor and all delivery routes",
+                "tags": [
+                    "monitor"
+                ],
+                "description": "Returns the current rule, filters, hit-row count and every route. Foreign and unknown IDs return 404. Timestamp fields use epoch seconds.",
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[1-9][0-9]{0,9}$"
+                        },
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Rule ID returned by createMonitorRule or listMonitorRules.",
+                        "example": "1"
+                    }
+                ],
+                "security": [
+                    {
+                        "aiBearer": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful get an owned monitor and all delivery routes response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "rule"
+                                    ],
+                                    "properties": {
+                                        "rule": {
+                                            "type": "object",
+                                            "additionalProperties": false,
+                                            "required": [
+                                                "id",
+                                                "platform",
+                                                "name",
+                                                "keywords",
+                                                "matchType",
+                                                "sourceAccounts",
+                                                "sourceGroups",
+                                                "sourceSenderUids",
+                                                "sourceSenderNames",
+                                                "ingestSources",
+                                                "enabled",
+                                                "destinations",
+                                                "createdAt",
+                                                "updatedAt",
+                                                "hitCount"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "maximum": 2147483647
+                                                },
+                                                "platform": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "telegram",
+                                                        "discord"
+                                                    ],
+                                                    "description": "Notification platform of the existing targets and rule."
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "keywords": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "matchType": {
+                                                    "type": "string"
+                                                },
+                                                "sourceAccounts": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "sourceGroups": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "sourceSenderUids": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "sourceSenderNames": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "ingestSources": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "enabled": {
+                                                    "type": "integer",
+                                                    "enum": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                "destinations": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "additionalProperties": false,
+                                                        "required": [
+                                                            "id",
+                                                            "targetId",
+                                                            "platform",
+                                                            "channelConfigId",
+                                                            "targetChat",
+                                                            "targetEnabled",
+                                                            "enabled",
+                                                            "template",
+                                                            "pushStrategy"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "minimum": 1,
+                                                                "maximum": 2147483647
+                                                            },
+                                                            "targetId": {
+                                                                "type": "integer",
+                                                                "minimum": 1,
+                                                                "maximum": 2147483647
+                                                            },
+                                                            "platform": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "telegram",
+                                                                    "discord"
+                                                                ],
+                                                                "description": "Notification platform of the existing targets and rule."
+                                                            },
+                                                            "channelConfigId": {
+                                                                "type": "integer",
+                                                                "minimum": 1,
+                                                                "maximum": 2147483647
+                                                            },
+                                                            "targetChat": {
+                                                                "type": "string"
+                                                            },
+                                                            "targetEnabled": {
+                                                                "type": "integer",
+                                                                "enum": [
+                                                                    0,
+                                                                    1
+                                                                ]
+                                                            },
+                                                            "enabled": {
+                                                                "type": "integer",
+                                                                "enum": [
+                                                                    0,
+                                                                    1
+                                                                ]
+                                                            },
+                                                            "template": {
+                                                                "type": "string"
+                                                            },
+                                                            "pushStrategy": {
+                                                                "type": "object",
+                                                                "additionalProperties": true
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "createdAt": {
+                                                    "type": "integer"
+                                                },
+                                                "updatedAt": {
+                                                    "type": "integer"
+                                                },
+                                                "hitCount": {
+                                                    "type": "integer",
+                                                    "description": "Stored rule/message/keyword hit rows, not unique message count or successful notification count."
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "rule": {
+                                        "id": 1,
+                                        "platform": "telegram",
+                                        "name": "Example watch",
+                                        "keywords": [
+                                            "故障"
+                                        ],
+                                        "matchType": "contains",
+                                        "sourceAccounts": [
+                                            "account-id"
+                                        ],
+                                        "sourceGroups": [
+                                            "group-id"
+                                        ],
+                                        "sourceSenderUids": [],
+                                        "sourceSenderNames": [],
+                                        "ingestSources": [
+                                            "realtime",
+                                            "latest-poll"
+                                        ],
+                                        "enabled": 0,
+                                        "destinations": [
+                                            {
+                                                "id": 1,
+                                                "targetId": 1,
+                                                "platform": "telegram",
+                                                "channelConfigId": 1,
+                                                "targetChat": "-1000000000000",
+                                                "targetEnabled": 1,
+                                                "enabled": 1,
+                                                "template": "",
+                                                "pushStrategy": {}
+                                            }
+                                        ],
+                                        "createdAt": 1794355200,
+                                        "updatedAt": 1794355200,
+                                        "hitCount": 0
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The request schema or filter combination is invalid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_REQUEST",
+                                    "error": "Request validation failed"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_API_TOKEN",
+                                    "error": "The API token is invalid"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The API token does not have the api:read scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "API_TOKEN_SCOPE_REQUIRED",
+                                    "error": "The API token requires the api:read scope"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Unknown rule or one belonging to another owner.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "RULE_NOT_FOUND",
+                                    "error": "Monitor rule not found"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected server failure occurred; internal details are never returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INTERNAL_ERROR",
+                                    "error": "Internal server error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "updateMonitorRule",
+                "summary": "Update or pause an owned monitor",
+                "tags": [
+                    "monitor"
+                ],
+                "description": "Updates only supplied fields. Requires api:write. enabled=false stops new matches after the existing matcher cache refresh (about 10 seconds); already queued or delivering notifications continue under current backend behavior. Destination lists replace all routes, so fetch the rule first. A shared rule change affects every destination.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "minProperties": 1,
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 200
+                                    },
+                                    "keywords": {
+                                        "type": "array",
+                                        "maxItems": 100,
+                                        "uniqueItems": true,
+                                        "items": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 512,
+                                            "pattern": "\\S"
+                                        },
+                                        "description": "Literal keywords ORed together; not the Boolean q search syntax. Empty is allowed for sender-only rules."
+                                    },
+                                    "matchType": {
+                                        "type": "string",
+                                        "enum": [
+                                            "contains",
+                                            "exact",
+                                            "regex"
+                                        ],
+                                        "description": "Existing case-insensitive matcher: substring, trimmed whole content, or regex (maximum 200 characters per pattern)."
+                                    },
+                                    "sourceAccounts": {
+                                        "type": "array",
+                                        "maxItems": 100,
+                                        "uniqueItems": true,
+                                        "items": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 512,
+                                            "pattern": "\\S"
+                                        },
+                                        "description": "Owned source account IDs. Empty means all owned accounts."
+                                    },
+                                    "sourceGroups": {
+                                        "type": "array",
+                                        "maxItems": 100,
+                                        "uniqueItems": true,
+                                        "items": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 512,
+                                            "pattern": "\\S"
+                                        },
+                                        "description": "Group IDs filtered within the selected source accounts; empty means all their groups. Account and group filters are independent AND conditions."
+                                    },
+                                    "sourceSenderUids": {
+                                        "type": "array",
+                                        "maxItems": 100,
+                                        "uniqueItems": true,
+                                        "items": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 512,
+                                            "pattern": "\\S"
+                                        },
+                                        "description": "Stable sender UIDs, ORed together. If keywords are also set, sender and keyword conditions are ANDed."
+                                    },
+                                    "ingestSources": {
+                                        "type": "array",
+                                        "minItems": 1,
+                                        "maxItems": 8,
+                                        "uniqueItems": true,
+                                        "items": {
+                                            "type": "string",
+                                            "enum": [
+                                                "realtime",
+                                                "latest-poll",
+                                                "startup",
+                                                "catchup",
+                                                "backfill",
+                                                "manual-history",
+                                                "viewer-sync",
+                                                "viewer-older"
+                                            ]
+                                        },
+                                        "description": "Defaults to realtime/latest-poll. Selecting backfill sources changes which newly ingested events are eligible; it does not replay already processed history."
+                                    },
+                                    "enabled": {
+                                        "type": "boolean"
+                                    },
+                                    "destinations": {
+                                        "type": "array",
+                                        "minItems": 1,
+                                        "maxItems": 100,
+                                        "items": {
+                                            "type": "object",
+                                            "additionalProperties": false,
+                                            "required": [
+                                                "targetId"
+                                            ],
+                                            "properties": {
+                                                "targetId": {
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "maximum": 2147483647,
+                                                    "description": "Owned target ID discovered with listNotificationTargets; never guess a chat ID."
+                                                },
+                                                "template": {
+                                                    "type": "string",
+                                                    "maxLength": 4000
+                                                },
+                                                "pushStrategy": {
+                                                    "type": "object",
+                                                    "additionalProperties": false,
+                                                    "properties": {
+                                                        "throttleSec": {
+                                                            "type": "integer",
+                                                            "minimum": 0,
+                                                            "maximum": 86400
+                                                        },
+                                                        "maxPerHour": {
+                                                            "type": "integer",
+                                                            "minimum": 0,
+                                                            "maximum": 10000
+                                                        },
+                                                        "silentFrom": {
+                                                            "type": "string",
+                                                            "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+                                                        },
+                                                        "silentTo": {
+                                                            "type": "string",
+                                                            "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+                                                        }
+                                                    }
+                                                },
+                                                "enabled": {
+                                                    "type": "boolean"
+                                                }
+                                            }
+                                        },
+                                        "description": "Complete destination list. PATCH replaces this list; preserve existing entries when changing one route. Each destination has independent delivery settings."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[1-9][0-9]{0,9}$"
+                        },
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Rule ID returned by createMonitorRule or listMonitorRules.",
+                        "example": "1"
+                    }
+                ],
+                "security": [
+                    {
+                        "aiBearer": []
+                    }
+                ],
+                "x-weibogroup-capability": "monitor",
+                "responses": {
+                    "200": {
+                        "description": "Successful update or pause an owned monitor response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "rule"
+                                    ],
+                                    "properties": {
+                                        "rule": {
+                                            "type": "object",
+                                            "additionalProperties": false,
+                                            "required": [
+                                                "id",
+                                                "platform",
+                                                "name",
+                                                "keywords",
+                                                "matchType",
+                                                "sourceAccounts",
+                                                "sourceGroups",
+                                                "sourceSenderUids",
+                                                "sourceSenderNames",
+                                                "ingestSources",
+                                                "enabled",
+                                                "destinations",
+                                                "createdAt",
+                                                "updatedAt",
+                                                "hitCount"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "maximum": 2147483647
+                                                },
+                                                "platform": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "telegram",
+                                                        "discord"
+                                                    ],
+                                                    "description": "Notification platform of the existing targets and rule."
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "keywords": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "matchType": {
+                                                    "type": "string"
+                                                },
+                                                "sourceAccounts": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "sourceGroups": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "sourceSenderUids": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "sourceSenderNames": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "ingestSources": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "enabled": {
+                                                    "type": "integer",
+                                                    "enum": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                "destinations": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "additionalProperties": false,
+                                                        "required": [
+                                                            "id",
+                                                            "targetId",
+                                                            "platform",
+                                                            "channelConfigId",
+                                                            "targetChat",
+                                                            "targetEnabled",
+                                                            "enabled",
+                                                            "template",
+                                                            "pushStrategy"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "minimum": 1,
+                                                                "maximum": 2147483647
+                                                            },
+                                                            "targetId": {
+                                                                "type": "integer",
+                                                                "minimum": 1,
+                                                                "maximum": 2147483647
+                                                            },
+                                                            "platform": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "telegram",
+                                                                    "discord"
+                                                                ],
+                                                                "description": "Notification platform of the existing targets and rule."
+                                                            },
+                                                            "channelConfigId": {
+                                                                "type": "integer",
+                                                                "minimum": 1,
+                                                                "maximum": 2147483647
+                                                            },
+                                                            "targetChat": {
+                                                                "type": "string"
+                                                            },
+                                                            "targetEnabled": {
+                                                                "type": "integer",
+                                                                "enum": [
+                                                                    0,
+                                                                    1
+                                                                ]
+                                                            },
+                                                            "enabled": {
+                                                                "type": "integer",
+                                                                "enum": [
+                                                                    0,
+                                                                    1
+                                                                ]
+                                                            },
+                                                            "template": {
+                                                                "type": "string"
+                                                            },
+                                                            "pushStrategy": {
+                                                                "type": "object",
+                                                                "additionalProperties": true
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "createdAt": {
+                                                    "type": "integer"
+                                                },
+                                                "updatedAt": {
+                                                    "type": "integer"
+                                                },
+                                                "hitCount": {
+                                                    "type": "integer",
+                                                    "description": "Stored rule/message/keyword hit rows, not unique message count or successful notification count."
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "rule": {
+                                        "id": 1,
+                                        "platform": "telegram",
+                                        "name": "Example watch",
+                                        "keywords": [
+                                            "故障"
+                                        ],
+                                        "matchType": "contains",
+                                        "sourceAccounts": [
+                                            "account-id"
+                                        ],
+                                        "sourceGroups": [
+                                            "group-id"
+                                        ],
+                                        "sourceSenderUids": [],
+                                        "sourceSenderNames": [],
+                                        "ingestSources": [
+                                            "realtime",
+                                            "latest-poll"
+                                        ],
+                                        "enabled": 0,
+                                        "destinations": [
+                                            {
+                                                "id": 1,
+                                                "targetId": 1,
+                                                "platform": "telegram",
+                                                "channelConfigId": 1,
+                                                "targetChat": "-1000000000000",
+                                                "targetEnabled": 1,
+                                                "enabled": 1,
+                                                "template": "",
+                                                "pushStrategy": {}
+                                            }
+                                        ],
+                                        "createdAt": 1794355200,
+                                        "updatedAt": 1794355200,
+                                        "hitCount": 0
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The request schema or filter combination is invalid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_REQUEST",
+                                    "error": "Request validation failed"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_API_TOKEN",
+                                    "error": "The API token is invalid"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The API token does not have the api:write scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "API_TOKEN_SCOPE_REQUIRED",
+                                    "error": "The API token requires the api:write scope"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Unknown rule or one belonging to another owner.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "RULE_NOT_FOUND",
+                                    "error": "Monitor rule not found"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected server failure occurred; internal details are never returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INTERNAL_ERROR",
+                                    "error": "Internal server error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "deleteMonitorRule",
+                "summary": "Delete an owned monitor",
+                "tags": [
+                    "monitor"
+                ],
+                "description": "Permanently deletes this rule, its destinations and historical hit records using existing backend behavior. Push jobs are retained with rule/destination references cleared; already queued notifications can still deliver. Archived messages are preserved. Prefer enabled=false to retain rule history. Requires api:write; delete only when the user explicitly requests deletion.",
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[1-9][0-9]{0,9}$"
+                        },
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Rule ID returned by createMonitorRule or listMonitorRules.",
+                        "example": "1"
+                    }
+                ],
+                "security": [
+                    {
+                        "aiBearer": []
+                    }
+                ],
+                "x-weibogroup-capability": "monitor",
+                "x-mcp-destructive": true,
+                "responses": {
+                    "200": {
+                        "description": "Successful delete an owned monitor response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "ok"
+                                    ],
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "ok": true
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The request schema or filter combination is invalid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_REQUEST",
+                                    "error": "Request validation failed"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_API_TOKEN",
+                                    "error": "The API token is invalid"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The API token does not have the api:write scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "API_TOKEN_SCOPE_REQUIRED",
+                                    "error": "The API token requires the api:write scope"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Unknown rule or one belonging to another owner.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "RULE_NOT_FOUND",
+                                    "error": "Monitor rule not found"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected server failure occurred; internal details are never returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INTERNAL_ERROR",
+                                    "error": "Internal server error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/monitor-rules/{id}/hits": {
+            "get": {
+                "operationId": "listMonitorRuleHits",
+                "summary": "List an owned monitor’s stored keyword hits",
+                "tags": [
+                    "monitor"
+                ],
+                "description": "Returns existing rule/message/keyword hit records. One message matching two keywords has two rows; hits do not mean notifications were delivered. Message IDs can be passed to getMessagesBatch for original text. History missing from the matcher is not inferred as zero matches.",
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "default": 20
+                        },
+                        "in": "query",
+                        "name": "limit",
+                        "required": false,
+                        "description": "Maximum records on this page.",
+                        "example": 20
+                    },
+                    {
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 10000,
+                            "default": 0
+                        },
+                        "in": "query",
+                        "name": "offset",
+                        "required": false,
+                        "description": "Use the returned nextOffset with the same filters; bounded to 10000.",
+                        "example": 0
+                    },
+                    {
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[1-9][0-9]{0,9}$"
+                        },
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Rule ID returned by createMonitorRule or listMonitorRules.",
+                        "example": "1"
+                    }
+                ],
+                "security": [
+                    {
+                        "aiBearer": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful list an owned monitor’s stored keyword hits response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "hits",
+                                        "pagination"
+                                    ],
+                                    "properties": {
+                                        "hits": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "additionalProperties": false,
+                                                "required": [
+                                                    "id",
+                                                    "accountId",
+                                                    "groupId",
+                                                    "messageId",
+                                                    "matchedKeyword",
+                                                    "messageTime",
+                                                    "senderUid",
+                                                    "senderName",
+                                                    "createdAt"
+                                                ],
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "minimum": 1,
+                                                        "maximum": 2147483647
+                                                    },
+                                                    "accountId": {
+                                                        "type": "string",
+                                                        "minLength": 1,
+                                                        "maxLength": 512,
+                                                        "pattern": "\\S"
+                                                    },
+                                                    "groupId": {
+                                                        "type": "string",
+                                                        "minLength": 1,
+                                                        "maxLength": 512,
+                                                        "pattern": "\\S"
+                                                    },
+                                                    "messageId": {
+                                                        "type": "string",
+                                                        "minLength": 1,
+                                                        "maxLength": 512,
+                                                        "pattern": "\\S"
+                                                    },
+                                                    "matchedKeyword": {
+                                                        "type": "string"
+                                                    },
+                                                    "messageTime": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "integer"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "senderUid": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "senderName": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "createdAt": {
+                                                        "type": "integer"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "pagination": {
+                                            "type": "object",
+                                            "additionalProperties": false,
+                                            "required": [
+                                                "nextOffset",
+                                                "truncated"
+                                            ],
+                                            "properties": {
+                                                "nextOffset": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "truncated": {
+                                                    "type": "boolean",
+                                                    "description": "More records exist beyond this page. At the offset cap, narrow the filters."
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "hits": [],
+                                    "pagination": {
+                                        "nextOffset": null,
+                                        "truncated": false
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The request schema or filter combination is invalid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_REQUEST",
+                                    "error": "Request validation failed"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_API_TOKEN",
+                                    "error": "The API token is invalid"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The API token does not have the api:read scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "API_TOKEN_SCOPE_REQUIRED",
+                                    "error": "The API token requires the api:read scope"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Unknown rule or one belonging to another owner.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "RULE_NOT_FOUND",
+                                    "error": "Monitor rule not found"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected server failure occurred; internal details are never returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INTERNAL_ERROR",
+                                    "error": "Internal server error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/monitor-rules/{id}/push-jobs": {
+            "get": {
+                "operationId": "listMonitorRulePushJobs",
+                "summary": "List delivery outcomes for an owned monitor",
+                "tags": [
+                    "monitor"
+                ],
+                "description": "Lists recent queued/sending/delivering/sent/failed/dead/cancelled notification jobs for this rule. No jobs does not establish that no messages matched: silent hours and rate limits can suppress a push before job creation. Raw provider errors and credentials are excluded.",
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "default": 20
+                        },
+                        "in": "query",
+                        "name": "limit",
+                        "required": false,
+                        "description": "Maximum records on this page.",
+                        "example": 20
+                    },
+                    {
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 10000,
+                            "default": 0
+                        },
+                        "in": "query",
+                        "name": "offset",
+                        "required": false,
+                        "description": "Use the returned nextOffset with the same filters; bounded to 10000.",
+                        "example": 0
+                    },
+                    {
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[1-9][0-9]{0,9}$"
+                        },
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "description": "Rule ID returned by createMonitorRule or listMonitorRules.",
+                        "example": "1"
+                    }
+                ],
+                "security": [
+                    {
+                        "aiBearer": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful list delivery outcomes for an owned monitor response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "jobs",
+                                        "pagination"
+                                    ],
+                                    "properties": {
+                                        "jobs": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "additionalProperties": false,
+                                                "required": [
+                                                    "id",
+                                                    "ruleId",
+                                                    "destinationId",
+                                                    "platform",
+                                                    "channelConfigId",
+                                                    "targetChat",
+                                                    "status",
+                                                    "attempts",
+                                                    "createdAt",
+                                                    "updatedAt",
+                                                    "sentAt"
+                                                ],
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "minimum": 1,
+                                                        "maximum": 2147483647
+                                                    },
+                                                    "ruleId": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "integer"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "destinationId": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "integer"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "platform": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "telegram",
+                                                            "discord"
+                                                        ],
+                                                        "description": "Notification platform of the existing targets and rule."
+                                                    },
+                                                    "channelConfigId": {
+                                                        "type": "integer",
+                                                        "minimum": 1,
+                                                        "maximum": 2147483647
+                                                    },
+                                                    "targetChat": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "string"
+                                                    },
+                                                    "attempts": {
+                                                        "type": "integer"
+                                                    },
+                                                    "createdAt": {
+                                                        "type": "integer"
+                                                    },
+                                                    "updatedAt": {
+                                                        "type": "integer"
+                                                    },
+                                                    "sentAt": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "integer"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "pagination": {
+                                            "type": "object",
+                                            "additionalProperties": false,
+                                            "required": [
+                                                "nextOffset",
+                                                "truncated"
+                                            ],
+                                            "properties": {
+                                                "nextOffset": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "truncated": {
+                                                    "type": "boolean",
+                                                    "description": "More records exist beyond this page. At the offset cap, narrow the filters."
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "jobs": [],
+                                    "pagination": {
+                                        "nextOffset": null,
+                                        "truncated": false
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The request schema or filter combination is invalid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_REQUEST",
+                                    "error": "Request validation failed"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INVALID_API_TOKEN",
+                                    "error": "The API token is invalid"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The API token does not have the api:read scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "API_TOKEN_SCOPE_REQUIRED",
+                                    "error": "The API token requires the api:read scope"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Unknown rule or one belonging to another owner.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "RULE_NOT_FOUND",
+                                    "error": "Monitor rule not found"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected server failure occurred; internal details are never returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "code",
+                                        "error"
+                                    ],
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "description": "Stable machine-readable error code"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "code": "INTERNAL_ERROR",
+                                    "error": "Internal server error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "servers": [
@@ -10186,6 +13276,10 @@
         {
             "name": "exports",
             "description": "Owner-scoped background archive exports and authenticated downloads"
+        },
+        {
+            "name": "monitor",
+            "description": "Existing keyword/sender monitors, notification targets, hits and delivery outcomes"
         }
     ]
 }

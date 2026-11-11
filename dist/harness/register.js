@@ -1,17 +1,17 @@
 import { createMcpToolDefinition } from '@deepseek-ai/dsh-mcp-client';
 import '@deepseek-ai/dsh-system-prompt';
-import { INSTRUCTIONS, EXPORT_INSTRUCTIONS } from './instructions.js';
+import { INSTRUCTIONS, EXPORT_INSTRUCTIONS, MONITOR_INSTRUCTIONS } from './instructions.js';
 import { registerExportDownload } from './exports.js';
 /** Host-only registration, presentation and lifecycle ownership. */
 export function registerArchiveTools(ctx, client, config) {
     ctx.systemPrompt.section({
         name: 'tool:weibogroup', order: 650,
-        text: ({ scope }) => ctx.tools.get('weibo_listAccounts', scope) ? INSTRUCTIONS + '\n' + EXPORT_INSTRUCTIONS : '',
+        text: ({ scope }) => ctx.tools.get('weibo_listAccounts', scope) ? [INSTRUCTIONS, EXPORT_INSTRUCTIONS, MONITOR_INSTRUCTIONS].join('\n') : '',
     });
     for (const tool of client.tools) {
         const definition = createMcpToolDefinition(ctx, {
             name: `weibo_${tool.name}`, rawName: tool.name,
-            description: `[微博群聊${tool.annotations?.readOnlyHint ? '查询' : '导出任务'}] ${tool.description ?? tool.name}`
+            description: `[微博群聊${tool.annotations?.readOnlyHint ? '查询' : tool._meta?.['weibogroup/capability'] === 'monitor' ? '监控设置' : '导出任务'}] ${tool.description ?? tool.name}`
                 + (tool.name === 'searchMessages' ? '\nHarness 每次只读取请求的一页，limit=10 最多返回10条；完整统计请使用服务端 timeline，确需更多原文时显式继续 nextCursor。' : ''),
             inputSchema: tool.inputSchema,
             outputSchema: tool.outputSchema,

@@ -6,7 +6,7 @@
 - “找出阿尼亚的 UID，总结她上个月关于 AI 的发言，附原文链接。”
 - “统计阿尼亚发出的红包，按年月画条形图。发送条数和可见领取金额分别展示。”
 
-标准 Harness 提供 23 个原生工具（`weibo_` 前缀，含查询、导出任务和附件下载）：账号与群发现、成员与资料查询、
+标准 Harness 提供 31 个原生工具（`weibo_` 前缀，含查询、导出任务、附件下载和监控管理）：账号与群发现、成员与资料查询、
 消息搜索/批量读取/上下文/窗口、时间线、发言与关键词统计、词云、市场报价。
 自然语言理解和回答由 Harness 当前选择的模型完成，不需要再配置一套模型。
 支持复用后台生成 CSV/XLSX/JSON、单人 PDF/ZIP，并以原生文件附件交付。微博发送、图片/视频上传和撤回工具继续不注册。已验证命令行 Harness **0.2.0-rc.2** 和桌面版 **0.2.2-rc.1** 的工具接口。
@@ -17,13 +17,13 @@
 npm ci --ignore-scripts
 npm test
 npm pack
-dsh plugin --profile web add /srv/data/code/dshplugin/dsh-weibogroup/dsh-weibogroup-0.3.0.tgz
+dsh plugin --profile web add /srv/data/code/dshplugin/dsh-weibogroup/dsh-weibogroup-0.4.0.tgz
 ```
 
 桌面版在插件页安装同一安装包：
 
 ```text
-file:/srv/data/code/dshplugin/dsh-weibogroup/dsh-weibogroup-0.3.0.tgz
+file:/srv/data/code/dshplugin/dsh-weibogroup/dsh-weibogroup-0.4.0.tgz
 ```
 
 安装后重启对应 Harness 实例。禁用或卸载插件后，工具和问答指引自动撤回。
@@ -71,6 +71,30 @@ Token 每次调用时读取，轮换后无需重新打包。安装包不含网�
 `result.messageCount/rowLimit/truncated/failedAssetCount` 说明覆盖范围；下载结果会再次提示截断及附件失败。旧任务缺少统计信息时提示覆盖范围未知。创建任务是写操作，需要写权限；list/status/download 使用读权限。
 
 下载默认上限64 MiB、120秒，可配置 `maxExportBytes`（最大512 MiB）及 `exportTimeoutMs`（最大10分钟）。附件存储服务存在时启用下载工具；标准桌面/web/headless profile 均提供该服务。自定义精简 profile 应挂载 `attachments` 能力。
+
+## 后台关键词与发送者监控
+
+例如“监控 tt 群提到故障的消息，发到我的 Telegram”“把某条规则暂停”或
+“查看这条规则最近命中了什么、通知有没有发送”。支持 WeiboGroup 1.0.27+。
+
+- `weibo_listNotificationTargets`：发现已配置的 Telegram/Discord 目标，不返回 Bot 凭据。
+- `weibo_listMonitorRules`、`weibo_getMonitorRule`：读取后台同一份规则及全部投递路由。
+- `weibo_createMonitorRule`、`weibo_updateMonitorRule`、`weibo_deleteMonitorRule`：创建、修改、启停和明确删除；需要 api:write。
+- `weibo_listMonitorRuleHits`、`weibo_listMonitorRulePushJobs`：区分关键词命中与通知投递；均支持分页。
+
+沿用后台 contains/exact/regex 匹配方式，关键词内部 OR、发送者 UID 内部 OR，
+两类条件之间 AND；仅 UID 的规则可以关注该人的全部发言。默认实时/最新轮询
+来源，已处理的历史不自动重放。每个 destination 独立配置模板、限频、静默时段。
+PATCH 仅修改传入字段；destinations 数组整体替换，修改前应读取并保留其他路由。
+账号与群组是独立筛选，限定一个群时同时指定其账号，避免放大作用域。
+
+启停沿用后台缓存，约 10 秒刷新；暂停后已入队通知仍可能发送。删除会移除规则、
+路由与命中历史，已有投递任务保留且解除关联；只想停用时使用 enabled=false。
+hitCount 按规则/消息/关键词记录计算，同一条消息命中两个词会计两条。
+没有投递任务不能证明没有命中，静默和限频可以在入队前抑制通知。
+
+列表默认20条、最大100条，用 pagination.nextOffset 翻页。分页是实时视图，
+并发增删时顺序可能变化；truncated=true 代表还有记录，不能当作完整清单。
 
 ## 统计口径
 
