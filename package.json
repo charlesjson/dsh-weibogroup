@@ -4,6 +4,9 @@
   "description": "DeepSeek Harness 微博群聊问答、后台导出和关键词监控",
   "type": "module",
   "license": "ISC",
+  "repository": { "type": "git", "url": "git+https://github.com/charlesjson/dsh-weibogroup.git" },
+  "homepage": "https://github.com/charlesjson/dsh-weibogroup#readme",
+  "bugs": { "url": "https://github.com/charlesjson/dsh-weibogroup/issues" },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

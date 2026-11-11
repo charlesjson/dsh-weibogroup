@@ -13,20 +13,32 @@
 
 ## 安装
 
+通过固定的 GitHub 版本安装：
+
 ```sh
+dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.4.0
+dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.4.0
+```
+
+桌面版在插件页填写同一 GitHub 引用：
+
+```text
+github:charlesjson/dsh-weibogroup#v0.4.0
+```
+
+安装后重启对应 Harness 实例。版本标签与锁文件固定源码提交，避免跟随 main
+的未发布改动。仓库包含编译后的 dist，安装时不需要后端源码或重新编译。
+禁用或卸载插件后，工具和问答指引自动撤回。
+
+本地开发与打包：
+
+```sh
+git clone https://github.com/charlesjson/dsh-weibogroup.git
+cd dsh-weibogroup
 npm ci --ignore-scripts
 npm test
 npm pack
-dsh plugin --profile web add /srv/data/code/dshplugin/dsh-weibogroup/dsh-weibogroup-0.4.0.tgz
 ```
-
-桌面版在插件页安装同一安装包：
-
-```text
-file:/srv/data/code/dshplugin/dsh-weibogroup/dsh-weibogroup-0.4.0.tgz
-```
-
-安装后重启对应 Harness 实例。禁用或卸载插件后，工具和问答指引自动撤回。
 
 ## 连接配置
 
