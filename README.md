@@ -16,14 +16,14 @@
 通过固定的 GitHub 版本安装：
 
 ```sh
-dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.6.2
-dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.6.2
+dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.6.3
+dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.6.3
 ```
 
 桌面版在插件页填写同一 GitHub 引用：
 
 ```text
-github:charlesjson/dsh-weibogroup#v0.6.2
+github:charlesjson/dsh-weibogroup#v0.6.3
 ```
 
 安装后重启对应 Harness 实例。版本标签与锁文件固定源码提交，避免跟随 main
@@ -147,7 +147,7 @@ Telegram 的命令轮询状态与推送投递分别判断；失败分类仅是�
 现有接口可间接实现指定范围内的完整消息读取：固定账号/群/日期，按时间顺序调用
 `searchMessages`，保持筛选条件一致，显式续用 `nextCursor` 直到结束，并核对分页标记与服务端统计。
 用户发言排行榜在所有日期模式下排除系统消息和未知发送者UID，原始消息时间线/导出则保留原始记录口径，核对总数时先统一筛选。
-单页最多1000条；插件每次调用还有条数与响应字节预算，未读完要继续游标。
+Harness 消息搜索和窗口每页默认10条、最大20条；每页还有24KB输出预算，长消息会自动缩小本页条数，未读完要继续返回的游标。
 也可创建JSON/CSV导出，检查 `result.truncated`，下载原生附件后由DSH读取文件、分段总结。
 文件下载完成不等于模型已处理全部内容。导出最多10万条，超过时应拆分范围。
 这些能力针对已归档消息，不能补回未采集的数据，也不能把活动采集期间的分页当作冻结快照。
@@ -164,6 +164,37 @@ Harness 普通消息搜索只读取请求的一页，`limit=10` 最多返回10�
 发送总额。没有可验证的金额字段时，回答应说明缺失。图表由 Harness 的展示/
 文件工具基于已核对数据生成。插件不会把参考截图的数值当作真实查询结果。
 
+## 消息分页与模型上下文预算
+
+插件将分页方法同时写进工具参数、工具说明和模型系统指引。无需修改后端 REST API。
+本节能力从 `0.6.3` 开始提供。桌面 profile 由 DSH 应用管理，须通过桌面插件页安装
+上面的 GitHub 引用或本地 `dsh-weibogroup-0.6.3.tgz`；CLI 不支持直接管理桌面 profile。
+安装后重启相应实例，加载新工具参数与模型指引。
+
+| 工具 | 首次读取 | 继续读取 |
+| --- | --- | --- |
+| `weibo_searchMessages` | `limit=10`（最大20），优先限定账号/群/日期 | 把 `nextCursor` 原样传入 `cursor`，其他筛选和排序不变 |
+| `weibo_getMessageContext` | `before/after` 默认各5，定义总窗口；`pageSize=10`（最大20） | 把 `nextPageCursor` 原样传入 `pageCursor`，账号/群/目标/before/after/raw/detail不变 |
+| `weibo_getMessageWindow` | `limit=10`（最大20），只传一个方向的消息ID | 使用返回的 `pagination.continuation` 参数；向旧用本页首条ID，向新用末条ID |
+
+上下文的 `pagination.totalMessageCount` 是请求窗口内的条数，`complete` 只表示该窗口已读到末尾。
+`targetIncluded=false` 表示目标原文不在当前页，须继续读取后才能核验引文。
+上下文游标绑定查询范围和窗口快照；出现 `CONTEXT_PAGE_STALE` 时省略 `pageCursor` 从第一页重新读取。
+这不冻结整个归档。搜索与窗口是实时游标，不提供跨调用的冻结快照。
+窗口的 `hasMore=null` 表示暂时未知；后续为空页或 `hasMore=false` 才能确认该方向结束。
+三类游标不能互换，`beforeMessageId/afterMessageId` 不能同时传入。
+
+列表默认 `detail="compact"`：正文 `content` 完整保留，返回消息身份、发送者、时间、状态、引用锚点和附件键；
+省略头像、个人主页、附件 metadata、重复引用树和逐条搜索摘要。省略字段会在 `presentation.omittedFields` 中列出。
+顶层搜索模式、语义降级和候选集截断信息继续保留。需要详细引用、附件字段时优先
+`getMessagesBatch(keys=[{accountId,groupId,messageId}])` 单条读取；也可小页 `detail="full"`。
+显式 `raw="1"` 保留完整字段。列表每页不超过24KB文本，按完整消息边界缩页，不裁剪正文。
+单条也超过预算时返回 `MESSAGE_TOO_LARGE` 和 `messageKey`，不跳过消息、不推进游标；再按该键读取详情。
+精确详情工具仍可返回较大原文，因此应按需单条调用。
+
+文本输出为多行JSON，方便宿主 `read` 分段读取。若宿主仍产生溢出文件，用宿主文件工具按段读取，
+不要通过 bash 反复寻找 `/tmp` 文件：命令沙箱可能使用独立的临时目录。
+
 ## 验证与维护
 
 源码按职责组织：
@@ -173,6 +204,7 @@ Harness 普通消息搜索只读取请求的一页，`limit=10` 最多返回10�
 | `src/index.ts` | Cordis 插件入口与组合 |
 | `src/config.ts` | 配置 schema、默认值与边界校验 |
 | `src/api/client.ts`、`exports.ts` | 与 Harness 无关的归档客户端及有界文件流；统一鉴权、取消及返回预算 |
+| `src/api/message-pages.ts` | Harness 消息参数、精简投影、上下文游标、输出字节预算与窗口继续参数 |
 | `src/api/connection.ts`、`transport.ts` | 凭据文件、HTTPS、来源限制与重定向保护 |
 | `src/api/session.ts` | 查询与导出共用的凭据快照、取消信号及 HTTP 执行预算 |
 | `src/api/catalog.ts` | 从 OpenAPI 发现操作，统一只读查询及 export/monitor/collection 写能力的开放、展示与并发策略 |

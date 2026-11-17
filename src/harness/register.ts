@@ -22,11 +22,7 @@ export function registerArchiveTools(ctx: Context, client: ArchiveClient, config
     const definition = createMcpToolDefinition(ctx, {
       name: `weibo_${tool.name}`,
       rawName: tool.name,
-      description:
-        `[微博群聊${policy.label}] ${tool.description ?? tool.name}` +
-        (tool.name === 'searchMessages'
-          ? '\nHarness 每次只读取请求的一页，limit=10 最多返回10条；完整统计请使用服务端 timeline，确需更多原文时显式继续 nextCursor。'
-          : ''),
+      description: `[微博群聊${policy.label}] ${tool.description ?? tool.name}`,
       inputSchema: tool.inputSchema,
       outputSchema: tool.outputSchema,
       call: (args, execution) => client.call(tool.name, args, execution.signal),

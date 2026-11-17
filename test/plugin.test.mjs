@@ -158,6 +158,10 @@ test('actual Harness ToolRuntime validates and executes a registered archive que
   let searchRequests = 0
   globalThis.fetch = async (url, init) => {
     assert.equal(init.headers.authorization, `Bearer ${token}`)
+    if (new URL(url).pathname === '/api/v1/messages/context') {
+      const example = document.paths['/api/v1/messages/context'].get.responses['200'].content['application/json'].example
+      return Response.json({ ...example, messages: Array.from({ length: 12 }, (_, i) => ({ ...example.messages[0], messageId: String(i + 1) })) })
+    }
     if (new URL(url).pathname === '/api/v1/messages') {
       searchRequests++
       const example = document.paths['/api/v1/messages'].get.responses['200'].content['application/json'].example
@@ -179,6 +183,14 @@ test('actual Harness ToolRuntime validates and executes a registered archive que
   const search = await execute('weibo-small-sample', 'weibo_searchMessages', { limit: 1 })
   assert.equal(search.isError, false, JSON.stringify(search))
   assert.equal(searchRequests, 1, 'limit=1 must not expand into the complete archive')
+  const context = await execute('weibo-context-page', 'weibo_getMessageContext', {
+    accountId: 'account-id', groupId: 'group-id', messageId: '6', pageSize: 3,
+  })
+  assert.equal(context.isError, false, JSON.stringify(context))
+  assert.match(JSON.stringify(context), /nextPageCursor/)
+  assert.equal(ctx.tools.get('weibo_getMessageContext').parameters.properties.pageSize.maximum, 20)
+  assert.equal(ctx.tools.get('weibo_searchMessages').parameters.properties.limit.default, 10)
+  assert.match(ctx.tools.get('weibo_getMessageContext').description, /targetIncluded/)
   assert.ok(ctx.tools.get('weibo_listGroupMembers').parameters.properties.q)
   assert.ok(ctx.tools.get('weibo_listGroups').parameters.properties.q)
 })
