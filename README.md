@@ -16,14 +16,14 @@
 通过固定的 GitHub 版本安装：
 
 ```sh
-dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.6.1
-dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.6.1
+dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.6.2
+dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.6.2
 ```
 
 桌面版在插件页填写同一 GitHub 引用：
 
 ```text
-github:charlesjson/dsh-weibogroup#v0.6.1
+github:charlesjson/dsh-weibogroup#v0.6.2
 ```
 
 安装后重启对应 Harness 实例。版本标签与锁文件固定源码提交，避免跟随 main
@@ -215,10 +215,14 @@ WeiboGroup 的 MCP 适配层，来源见 THIRD_PARTY_NOTICES.md。
 
 ## DSH 兼容声明
 
-`engines.dsh` 与所有 DSH peer 依赖统一声明为 `0.2.0-rc.2 || >=0.2.2-rc.1 <0.3.0-0`。
-同一 0.2 系列的后续 RC、补丁和正式版本不再因为精确版本声明而被禁用；
-`0.3.0`（含预发布版）及更高版本需要重新验证。开发依赖和锁文件用于固定测试基线，
-不代表宿主只能运行该基线版本。兼容范围检查不等于未来接口已验证。
+宿主与 DSH peer 依赖统一声明为 `0.2.0-rc.2 || >=0.2.2-rc.1`，只保留最低版本，不再设置未来版本上限。
+Cordis peer 同样只保留已验证的最低版本；开发依赖与锁文件仍固定测试基线。
+以后升级到 0.3、1.0 或更高版本时，不会仅因版本号变化被本插件声明禁用。
 
-本次在 DSH `0.2.2-rc.2` 的实际兼容检查器下验证，
-`npm test` 包含当前 RC、后续 0.2 版本和 0.3 预发布上限的回归检查。
+插件在注册功能前检查其依赖的宿主方法；前端插件也会在注册界面前检查方法。
+缺少必需方法时会报告 `DSH_API_UNSUPPORTED` 和具体接口名称，不会先留下部分注册。
+新增无关接口不影响加载。缺少已声明的注入服务或模块导出时，宿主加载器会报告相应依赖错误。
+方法存在性检查无法证明参数、返回值、事件结构或行为语义完全不变；这类变更仍可能需要适配。
+
+`npm test` 与 `npm pack` 使用真实 DSH 兼容检查器覆盖最低版本和未来主版本号；
+未来版本矩阵检查的是声明策略，不代表尚未发布的宿主已经经过集成测试。

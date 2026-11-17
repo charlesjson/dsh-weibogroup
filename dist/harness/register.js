@@ -1,3 +1,4 @@
+import { hostMethodsAvailable } from '../host-api.js';
 import { registerImageRead } from './images.js';
 import { createMcpToolDefinition } from '@deepseek-ai/dsh-mcp-client';
 import '@deepseek-ai/dsh-system-prompt';
@@ -36,6 +37,8 @@ export function registerArchiveTools(ctx, client, config) {
         ctx.tools.register(definition);
     }
     ctx.inject(['attachments'], (fileCtx) => {
+        if (!hostMethodsAvailable('dsh-weibogroup/attachments', fileCtx, ['attachments.saveFileStream']))
+            return;
         registerExportDownload(fileCtx, client, config);
         registerImageRead(fileCtx, client, config);
     });

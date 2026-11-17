@@ -1,3 +1,4 @@
+import { assertHostMethods } from './host-api.js'
 import type { Context } from '@deepseek-ai/cordis'
 import { validateConfig, type Config } from './config.js'
 import { createArchiveClient } from './api/client.js'
@@ -9,6 +10,8 @@ export const name = 'weibo-group'
 export const inject = ['tools', 'systemPrompt']
 
 export function apply(ctx: Context, config: Config): void {
+  assertHostMethods('dsh-weibogroup', ctx, ['effect', 'inject', 'tools.register', 'tools.get', 'systemPrompt.section'])
+
   validateConfig(config)
   registerArchiveTools(ctx, createArchiveClient(config), config)
 }

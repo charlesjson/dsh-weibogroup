@@ -1,3 +1,4 @@
+import { hostMethodsAvailable } from '../host-api.js'
 import { registerImageRead } from './images.js'
 import type { Context } from '@deepseek-ai/cordis'
 import { createMcpToolDefinition } from '@deepseek-ai/dsh-mcp-client'
@@ -40,6 +41,7 @@ export function registerArchiveTools(ctx: Context, client: ArchiveClient, config
     ctx.tools.register(definition)
   }
   ctx.inject(['attachments'], (fileCtx) => {
+    if (!hostMethodsAvailable('dsh-weibogroup/attachments', fileCtx, ['attachments.saveFileStream'])) return
     registerExportDownload(fileCtx, client, config)
     registerImageRead(fileCtx, client, config)
   })
