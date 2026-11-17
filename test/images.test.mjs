@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createHash } from 'node:crypto'
 import { Context, Service } from '@deepseek-ai/cordis'
-import { ToolRuntime } from '@deepseek-ai/dsh-tools'
+import { installNativeTools, executeNativeTool } from './runtime.mjs'
 import { AttachmentId } from '@deepseek-ai/dsh-attachment'
 import { createArchiveClient } from '../dist/api/client.js'
 import { registerImageRead } from '../dist/harness/images.js'
@@ -167,7 +167,7 @@ for (const vision of [true, false])
     await ctx.plugin(Prompts)
     await ctx.plugin(Llm)
     await ctx.plugin(Attachments)
-    await ctx.plugin(ToolRuntime, { mode: 'native' })
+    await installNativeTools(ctx)
     await ctx.plugin({
       name: 'image-test',
       inject: ['tools', 'attachments'],
@@ -179,7 +179,7 @@ for (const vision of [true, false])
       options: { provider: 'test', model: vision ? 'vision' : 'text' },
       session: { requestHeader: () => ({ config: { provider: 'test', model: vision ? 'vision' : 'text' } }) },
     }
-    const result = await ctx.tools.execute({
+    const result = await executeNativeTool(ctx, {
       callId: 'image-test',
       name: 'weibo_readMessageImage',
       arguments: key,

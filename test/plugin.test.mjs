@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Context, Service } from '@deepseek-ai/cordis'
 import { ToolRuntime } from '@deepseek-ai/dsh-tools'
+import * as NativeExecutor from '@deepseek-ai/dsh-tool-executor-native'
 import { apply, archiveToolCatalog } from '../dist/index.js'
 import { loadConnection } from '../dist/api/connection.js'
 import { authenticatedFetch } from '../dist/api/transport.js'
@@ -146,7 +147,8 @@ test('actual Harness ToolRuntime validates and executes a registered archive que
     section() {}
   }
   await ctx.plugin(Prompts)
-  await ctx.plugin(ToolRuntime, { mode: 'native' })
+  await ctx.plugin(ToolRuntime)
+  await ctx.plugin(NativeExecutor)
   await ctx.plugin({ name: 'weibo-test', inject: ['tools', 'systemPrompt'], apply: child => apply(child, {
     connectionFile: file, timeoutMs: 1000, maxResponseBytes: 100000, maxMessages: 100,
   }) })
@@ -167,10 +169,14 @@ test('actual Harness ToolRuntime validates and executes a registered archive que
     return Response.json(document.paths['/api/v1/accounts'].get.responses['200'].content['application/json'].example)
   }
   assert.ok(ctx.tools.schemas().some(tool => tool.name === 'weibo_listAccounts'))
-  const result = await ctx.tools.execute({ callId: 'weibo-fixture-call', name: 'weibo_listAccounts', arguments: {}, signal: new AbortController().signal })
+  const execute = async (id, name, args) => {
+    const batch = await ctx.tools.execute({ calls: [{ type: 'tool-call', id, name, arguments: JSON.stringify(args) }], signal: new AbortController().signal })
+    return batch.results[0].result
+  }
+  const result = await execute('weibo-fixture-call', 'weibo_listAccounts', {})
   assert.equal(result.isError, false, JSON.stringify(result))
   assert.match(JSON.stringify(result), /Research account/)
-  const search = await ctx.tools.execute({ callId: 'weibo-small-sample', name: 'weibo_searchMessages', arguments: { limit: 1 }, signal: new AbortController().signal })
+  const search = await execute('weibo-small-sample', 'weibo_searchMessages', { limit: 1 })
   assert.equal(search.isError, false, JSON.stringify(search))
   assert.equal(searchRequests, 1, 'limit=1 must not expand into the complete archive')
   assert.ok(ctx.tools.get('weibo_listGroupMembers').parameters.properties.q)

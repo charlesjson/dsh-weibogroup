@@ -4,7 +4,7 @@ import { mkdtemp, writeFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Context, Service } from '@deepseek-ai/cordis'
-import { ToolRuntime } from '@deepseek-ai/dsh-tools'
+import { installNativeTools, executeNativeTool } from './runtime.mjs'
 import { apply, archiveToolCatalog } from '../dist/index.js'
 import document from '../dist/contracts/openapi.json' with { type: 'json' }
 
@@ -25,7 +25,7 @@ test('native collection and notification tools execute strict scoped requests wi
     section(value) { section=value }
   }
   await ctx.plugin(Prompts)
-  await ctx.plugin(ToolRuntime,{mode:'native'})
+  await installNativeTools(ctx)
   await ctx.plugin({name:'collection-test',inject:['tools','systemPrompt'],apply:child=>apply(child,{connectionFile:file,timeoutMs:1000,maxResponseBytes:100000,maxMessages:100})})
   t.after(()=>ctx.fiber.dispose())
   assert.match(section.text({}),/工具没有 from\/to 日期停止条件/)
@@ -47,7 +47,7 @@ test('native collection and notification tools execute strict scoped requests wi
     if (url.pathname.endsWith('/pause')) return Response.json({...example('/api/v1/history-jobs','post'),job:{...example('/api/v1/history-jobs','post').job,status:'paused'}})
     return Response.json(example(url.pathname))
   }
-  const execute = (name,args={})=>ctx.tools.execute({callId:name,name:'weibo_'+name,arguments:args,signal:new AbortController().signal})
+  const execute = (name,args={})=>executeNativeTool(ctx, {callId:name,name:'weibo_'+name,arguments:args,signal:new AbortController().signal})
   const created = await execute('createHistoryJob',{accountId:'account-id',groupId:'group-id',count:1,pages:1})
   assert.equal(created.isError,false,JSON.stringify(created))
   assert.deepEqual(requests[0],{method:'POST',path:'/api/v1/history-jobs',body:{accountId:'account-id',groupId:'group-id',count:1,pages:1}})

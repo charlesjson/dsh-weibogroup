@@ -4,7 +4,7 @@ import { mkdtemp, writeFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Context, Service } from '@deepseek-ai/cordis'
-import { ToolRuntime } from '@deepseek-ai/dsh-tools'
+import { installNativeTools, executeNativeTool } from './runtime.mjs'
 import { AttachmentId } from '@deepseek-ai/dsh-attachment'
 import { createHash } from 'node:crypto'
 import { createArchiveClient } from '../dist/api/client.js'
@@ -133,10 +133,10 @@ test('actual Harness runtime publishes a durable file attachment from the stream
       return { attachmentId: AttachmentId(createHash('sha256').update(saved).digest('hex')), name, bytes: saved.length }
     }
   }
-  await ctx.plugin(Prompts); await ctx.plugin(ToolRuntime, { mode: 'native' }); await ctx.plugin(Attachments)
+  await ctx.plugin(Prompts); await installNativeTools(ctx); await ctx.plugin(Attachments)
   await ctx.plugin({ name: 'export-test', inject: ['tools', 'attachments'], apply: child => registerExportDownload(child, client, config) })
   t.after(() => ctx.fiber.dispose())
-  const result = await ctx.tools.execute({ callId: 'download-case', name: 'weibo_downloadExport', arguments: { id }, signal: new AbortController().signal })
+  const result = await executeNativeTool(ctx, { callId: 'download-case', name: 'weibo_downloadExport', arguments: { id }, signal: new AbortController().signal })
   assert.equal(result.isError, false, JSON.stringify(result))
   assert.deepEqual(saved, bytes)
   const file = result.content.find(block => block.type === 'file')

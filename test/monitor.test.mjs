@@ -4,7 +4,7 @@ import { mkdtemp, writeFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Context, Service } from '@deepseek-ai/cordis'
-import { ToolRuntime } from '@deepseek-ai/dsh-tools'
+import { installNativeTools, executeNativeTool } from './runtime.mjs'
 import { apply, archiveToolCatalog } from '../dist/index.js'
 import document from '../dist/contracts/openapi.json' with { type: 'json' }
 
@@ -26,7 +26,7 @@ test('native Harness monitor writes use strict contracts and keep credentials in
     section(value) { section = value }
   }
   await ctx.plugin(Prompts)
-  await ctx.plugin(ToolRuntime, { mode: 'native' })
+  await installNativeTools(ctx)
   await ctx.plugin({ name: 'monitor-test', inject: ['tools', 'systemPrompt'], apply: child => apply(child, { connectionFile: file, timeoutMs: 1000, maxResponseBytes: 100000, maxMessages: 100 }) })
   assert.match(section.text({}), /已入队通知仍可能送达/)
   t.after(() => ctx.fiber.dispose())
@@ -45,7 +45,7 @@ test('native Harness monitor writes use strict contracts and keep credentials in
       ...(request.body.enabled === undefined ? {} : { enabled: request.body.enabled ? 1 : 0 }) }
     return Response.json({ rule: stored }, { status: init.method === 'POST' ? 201 : 200 })
   }
-  const execute = (name, args) => ctx.tools.execute({ callId: name, name: 'weibo_' + name, arguments: args, signal: new AbortController().signal })
+  const execute = (name, args) => executeNativeTool(ctx, { callId: name, name: 'weibo_' + name, arguments: args, signal: new AbortController().signal })
   const create = await execute('createMonitorRule', { platform: 'telegram', keywords: ['故障'], enabled: false, sourceAccounts: ['account-id'], sourceGroups: ['group-id'], destinations: [{ targetId: 1 }] })
   assert.equal(create.isError, false, JSON.stringify(create))
   assert.equal(ctx.tools.get('weibo_createMonitorRule').isConcurrencySafe({}), false)

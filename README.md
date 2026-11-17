@@ -9,21 +9,21 @@
 标准 Harness 提供 46 个原生工具（`weibo_` 前缀，含查询、导出任务、附件下载、监控管理、采集任务和通知诊断）：账号与群发现、成员与资料查询、
 消息搜索/批量读取/上下文/窗口、时间线、发言与关键词统计、词云、归档图片读取、采集任务、采集状态和通知诊断。
 自然语言理解和回答由 Harness 当前选择的模型完成，不需要再配置一套模型。
-支持复用后台生成 CSV/XLSX/JSON、单人 PDF/ZIP，并以原生文件附件交付。微博发送、图片/视频上传和撤回工具继续不注册。已验证命令行 Harness **0.2.0-rc.2** 和桌面版 **0.2.2-rc.1** 的工具接口。
+支持复用后台生成 CSV/XLSX/JSON、单人 PDF/ZIP，并以原生文件附件交付。微博发送、图片/视频上传和撤回工具继续不注册。已验证命令行 Harness **0.2.0-rc.2** 和桌面版 **0.2.2-rc.2** 的工具接口。
 
 ## 安装
 
 通过固定的 GitHub 版本安装：
 
 ```sh
-dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.6.0
-dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.6.0
+dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.6.1
+dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.6.1
 ```
 
 桌面版在插件页填写同一 GitHub 引用：
 
 ```text
-github:charlesjson/dsh-weibogroup#v0.6.0
+github:charlesjson/dsh-weibogroup#v0.6.1
 ```
 
 安装后重启对应 Harness 实例。版本标签与锁文件固定源码提交，避免跟随 main
@@ -212,3 +212,13 @@ npm run smoke
 WeiboGroup 的 MCP 适配层，来源见 THIRD_PARTY_NOTICES.md。
 
 公开文档、截图和验收摘要仅使用占位数据。不要提交真实昵称、UID、群名、群ID、实例地址、凭据、会话/导出任务标识或聊天内容；详细运行证据应留在私有环境。
+
+## DSH 兼容声明
+
+`engines.dsh` 与所有 DSH peer 依赖统一声明为 `0.2.0-rc.2 || >=0.2.2-rc.1 <0.3.0-0`。
+同一 0.2 系列的后续 RC、补丁和正式版本不再因为精确版本声明而被禁用；
+`0.3.0`（含预发布版）及更高版本需要重新验证。开发依赖和锁文件用于固定测试基线，
+不代表宿主只能运行该基线版本。兼容范围检查不等于未来接口已验证。
+
+本次在 DSH `0.2.2-rc.2` 的实际兼容检查器下验证，
+`npm test` 包含当前 RC、后续 0.2 版本和 0.3 预发布上限的回归检查。
