@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Weibo Group AI API",
-    "description": "Versioned API for querying archived Weibo group messages, users, groups and analytics, plus background archive exports, existing keyword/sender monitors, owned collection tasks and notification diagnostics, and sending text and image messages to owned groups. Use stable operationId values as AI tool names or expose them through the bundled MCP stdio adapter. Send API tokens as Bearer credentials; message-send operations require the api:write token scope.",
+    "description": "Versioned API for querying archived Weibo group messages, users, groups and analytics, plus background archive exports, existing keyword/sender monitors, owned collection tasks and notification diagnostics, and sending text and image messages to owned groups. Operations have stable operationId values. Send API tokens as Bearer credentials; message-send operations require the api:write token scope.",
     "version": "1.6.0"
   },
   "components": {
@@ -2567,8 +2567,19 @@
         "tags": [
           "messages"
         ],
-        "description": "Search archived messages after discovering accountId/groupId with listAccounts/listGroups. Check hasOpenGap before completeness-sensitive summaries. Prefer raw=0 and chronological time sorting. REST callers reuse identical filters, searchMode, sort and order with nextCursor until null when full pagination is needed; the stdio MCP adapter automatically aggregates chronological raw=0 pages up to its configured message/response budget and reports pagination.complete/truncated. Dates use the configured application timezone. semantic/hybrid first pages explicitly report whether vector search applied or fell back to lexical ranking and whether the bounded candidate window was truncated; candidate results are discovery evidence, not proof of full archive coverage.",
+        "description": "Search archived messages after discovering accountId/groupId with listAccounts/listGroups. Check hasOpenGap before completeness-sensitive summaries. Prefer raw=0 and chronological time sorting. Set includeSearchMetadata=false when only message records are needed; use getMessageTimeline for counts instead of downloading all matching messages. Each request returns one page. For further results pass nextCursor as cursor with identical filters, searchMode, sort and order. A null nextCursor ends pagination. Check pagination.complete and pagination.truncated before describing the result as complete. Dates use the configured application timezone. semantic/hybrid first pages explicitly report whether vector search applied or fell back to lexical ranking and whether the bounded candidate window was truncated; candidate results are discovery evidence, not proof of full archive coverage.",
         "parameters": [
+          {
+            "schema": {
+              "type": "boolean",
+              "default": true
+            },
+            "in": "query",
+            "name": "includeSearchMetadata",
+            "required": false,
+            "description": "Set false for bulk reads to omit per-message search scores, snippets and highlights and skip their computation. Matching, sorting, nextCursor, and top-level search/pagination metadata are unchanged. May change between cursor pages.",
+            "example": false
+          },
           {
             "schema": {
               "type": "string",
@@ -3102,12 +3113,12 @@
                       "properties": {
                         "complete": {
                           "type": "boolean",
-                          "description": "True only when this response covers every matching message; a false value requires continuing nextCursor."
+                          "description": "True when the result set ends on this page and the search candidate set was not truncated."
                         },
                         "pagesFetched": {
                           "type": "integer",
                           "minimum": 1,
-                          "description": "Number of chronological REST pages fetched while creating this response; a bounded partial result may have fetched one page that could not be included."
+                          "description": "Number of REST pages returned by this request (one)."
                         },
                         "returnedMessageCount": {
                           "type": "integer",
@@ -3116,7 +3127,7 @@
                         },
                         "truncated": {
                           "type": "boolean",
-                          "description": "True when a bounded MCP aggregation stopped before nextCursor became null or an upstream page reported truncation."
+                          "description": "True when the search candidate set was truncated. Use nextCursor to determine whether another result page is available."
                         }
                       }
                     },
@@ -6688,276 +6699,6 @@
         }
       }
     },
-    "/api/v1/analytics/wordcloud": {
-      "get": {
-        "operationId": "getWordCloud",
-        "summary": "Top words in a group",
-        "tags": [
-          "analytics"
-        ],
-        "description": "Returns frequency results plus explicit sample-size and truncation metadata.",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 512,
-              "pattern": "^(?!\\.{1,2}$)(?=[^\\u0000-\\u001F\\u007F]*\\S)[^\\u0000-\\u001F\\u007F]+$"
-            },
-            "in": "query",
-            "name": "accountId",
-            "required": true,
-            "description": "Account identifier returned by listAccounts.",
-            "example": "account-id"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 512,
-              "pattern": "^(?!\\.{1,2}$)(?=[^\\u0000-\\u001F\\u007F]*\\S)[^\\u0000-\\u001F\\u007F]+$"
-            },
-            "in": "query",
-            "name": "groupId",
-            "required": true,
-            "description": "Account-scoped group identifier returned by listGroups; always pair it with accountId.",
-            "example": "group-id"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 512,
-              "pattern": "^(?!\\.{1,2}$)(?=[^\\u0000-\\u001F\\u007F]*\\S)[^\\u0000-\\u001F\\u007F]+$"
-            },
-            "in": "query",
-            "name": "senderUid",
-            "required": false,
-            "description": "Weibo user identifier returned in message senderUid or a user/member response.",
-            "example": "1234567890"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
-            },
-            "in": "query",
-            "name": "from",
-            "required": false,
-            "description": "Inclusive valid calendar day in the configured application timezone (YYYY-MM-DD).",
-            "example": "2026-07-01"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
-            },
-            "in": "query",
-            "name": "to",
-            "required": false,
-            "description": "Inclusive valid calendar day in the configured application timezone (YYYY-MM-DD); must not precede from.",
-            "example": "2026-07-07"
-          },
-          {
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 200,
-              "default": 100
-            },
-            "in": "query",
-            "name": "limit",
-            "required": false,
-            "description": "Maximum number of distinct words returned after frequency ranking.",
-            "example": 100
-          }
-        ],
-        "security": [
-          {
-            "aiBearer": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful top words in a group response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "words",
-                    "sampleSize",
-                    "sampleLimit",
-                    "truncated"
-                  ],
-                  "properties": {
-                    "words": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "required": [
-                          "text",
-                          "count"
-                        ],
-                        "properties": {
-                          "text": {
-                            "type": "string"
-                          },
-                          "count": {
-                            "type": "integer"
-                          }
-                        }
-                      }
-                    },
-                    "sampleSize": {
-                      "type": "integer",
-                      "description": "Number of archived messages examined for this word-frequency result."
-                    },
-                    "sampleLimit": {
-                      "type": "integer",
-                      "description": "Maximum archived messages the operation is allowed to examine."
-                    },
-                    "truncated": {
-                      "type": "boolean",
-                      "description": "True when the message sample hit sampleLimit, so word frequencies may be incomplete."
-                    }
-                  }
-                },
-                "example": {
-                  "words": [
-                    {
-                      "text": "故障",
-                      "count": 3
-                    }
-                  ],
-                  "sampleSize": 42,
-                  "sampleLimit": 20000,
-                  "truncated": false
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "The request schema or filter combination is invalid.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "code",
-                    "error"
-                  ],
-                  "properties": {
-                    "code": {
-                      "type": "string",
-                      "description": "Stable machine-readable error code"
-                    },
-                    "error": {
-                      "type": "string",
-                      "description": "Human-readable error message"
-                    }
-                  }
-                },
-                "example": {
-                  "code": "INVALID_REQUEST",
-                  "error": "Request validation failed"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The Bearer API token is missing, malformed, expired, revoked, or unknown.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "code",
-                    "error"
-                  ],
-                  "properties": {
-                    "code": {
-                      "type": "string",
-                      "description": "Stable machine-readable error code"
-                    },
-                    "error": {
-                      "type": "string",
-                      "description": "Human-readable error message"
-                    }
-                  }
-                },
-                "example": {
-                  "code": "INVALID_API_TOKEN",
-                  "error": "The API token is invalid"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "The API token does not have the api:read scope.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "code",
-                    "error"
-                  ],
-                  "properties": {
-                    "code": {
-                      "type": "string",
-                      "description": "Stable machine-readable error code"
-                    },
-                    "error": {
-                      "type": "string",
-                      "description": "Human-readable error message"
-                    }
-                  }
-                },
-                "example": {
-                  "code": "API_TOKEN_SCOPE_REQUIRED",
-                  "error": "The API token requires the api:read scope"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "An unexpected server failure occurred; internal details are never returned.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "code",
-                    "error"
-                  ],
-                  "properties": {
-                    "code": {
-                      "type": "string",
-                      "description": "Stable machine-readable error code"
-                    },
-                    "error": {
-                      "type": "string",
-                      "description": "Human-readable error message"
-                    }
-                  }
-                },
-                "example": {
-                  "code": "INTERNAL_ERROR",
-                  "error": "Internal server error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/accounts/{accountId}/groups/{groupId}/messages": {
       "post": {
         "operationId": "sendGroupMessage",
@@ -8019,7 +7760,8 @@
                             "json",
                             "pdf",
                             "zip"
-                          ]
+                          ],
+                          "description": "Includes legacy PDF artifacts; new user exports support ZIP only."
                         },
                         "status": {
                           "type": "string",
@@ -8330,11 +8072,11 @@
     "/api/v1/exports/user": {
       "post": {
         "operationId": "createUserExport",
-        "summary": "Create a sender PDF or ZIP export",
+        "summary": "Create a sender Markdown/images ZIP export",
         "tags": [
           "exports"
         ],
-        "description": "Generate a sender PDF or Markdown/images ZIP through the existing owner-scoped background renderer. This personal-reading export uses the admin renderer's rules to omit recognized system/platform notices; use CSV/XLSX/JSON message export for raw message-kind records. Requires api:write. Use discovered accountId/groupId/senderUid and dates. Poll getExportJob, then download; inspect truncated and failedAssetCount. It never sends messages or changes the archive.",
+        "description": "Generate a sender Markdown/images ZIP through the existing owner-scoped background renderer. This personal-reading export uses the admin renderer's rules to omit recognized system/platform notices; use CSV/XLSX/JSON message export for raw message-kind records. Requires api:write. Use discovered accountId/groupId/senderUid and dates. Poll getExportJob, then download; inspect truncated and failedAssetCount. It never sends messages or changes the archive.",
         "requestBody": {
           "required": true,
           "content": {
@@ -8377,7 +8119,6 @@
                   "format": {
                     "type": "string",
                     "enum": [
-                      "pdf",
                       "zip"
                     ],
                     "default": "zip"
@@ -8458,7 +8199,8 @@
                             "json",
                             "pdf",
                             "zip"
-                          ]
+                          ],
+                          "description": "Includes legacy PDF artifacts; new user exports support ZIP only."
                         },
                         "status": {
                           "type": "string",
@@ -8838,7 +8580,8 @@
                               "json",
                               "pdf",
                               "zip"
-                            ]
+                            ],
+                            "description": "Includes legacy PDF artifacts; new user exports support ZIP only."
                           },
                           "status": {
                             "type": "string",
@@ -9174,7 +8917,8 @@
                             "json",
                             "pdf",
                             "zip"
-                          ]
+                          ],
+                          "description": "Includes legacy PDF artifacts; new user exports support ZIP only."
                         },
                         "status": {
                           "type": "string",
@@ -12766,7 +12510,7 @@
         "tags": [
           "collection"
         ],
-        "description": "Existing collector queue, ordered newest first. Query by account and group together for one group; status and jobKind are optional. Page is a live view. No payloads, leases or raw errors are returned.",
+        "description": "Existing collector queue, ordered newest first by creation time and task ID. Reads one bounded page plus a lookahead row without an exact total count. Query by account and group together for one group; status and jobKind are optional. Page is a live view. No payloads, leases or raw errors are returned.",
         "parameters": [
           {
             "schema": {
@@ -13338,7 +13082,8 @@
                     "type": "integer",
                     "minimum": 1,
                     "maximum": 50,
-                    "default": 20
+                    "default": 20,
+                    "description": "Messages requested per upstream page, not a total result limit. The collector applies its account request budget."
                   },
                   "pages": {
                     "type": "integer",
@@ -14659,7 +14404,7 @@
         "tags": [
           "collection"
         ],
-        "description": "Requires api:write. Continues backwards using the existing collector and saved cursor. Default duration is 30 minutes; explicit durationMinutes=0 walks until exhausted or canceled. It does not accept exact date boundaries. Reuses an existing active backfill when present; inspect returned parameters. Starting this does not replay keyword notifications from old archive rows.",
+        "description": "Requires api:write. Continues backwards using the existing collector and saved cursor, reusing durable progress between page quanta. Default duration is 30 minutes; explicit durationMinutes=0 walks until exhausted or canceled. It does not accept exact date boundaries. Reuses an existing active backfill when present; inspect returned parameters. Starting this does not replay keyword notifications from old archive rows.",
         "requestBody": {
           "required": true,
           "content": {
@@ -14690,19 +14435,22 @@
                     "type": "integer",
                     "minimum": 1,
                     "maximum": 50,
-                    "default": 20
+                    "default": 20,
+                    "description": "Messages requested per upstream page, not a total result limit. The collector applies its account request budget."
                   },
                   "intervalSeconds": {
                     "type": "integer",
                     "minimum": 1,
                     "maximum": 3600,
-                    "default": 6
+                    "default": 6,
+                    "description": "Minimum scheduled delay in seconds between page quanta; shared governor and queue contention can increase it."
                   },
                   "durationMinutes": {
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 10080,
-                    "default": 30
+                    "default": 30,
+                    "description": "Wall-clock duration in minutes from the first task start, including subsequent pauses and queue waits. Zero removes the duration limit; completion can also mean source exhaustion or cancellation, not full coverage."
                   }
                 }
               }
@@ -17314,7 +17062,7 @@
         "tags": [
           "collection"
         ],
-        "description": "Owner-scoped heartbeat, session, lease-presence, queue and last successful poll/realtime timestamps. online only means a fresh worker heartbeat; inspect session, breaker and last-success fields together. No worker identities, cookies or raw errors. Returned now and all timestamps use epoch seconds.",
+        "description": "Owner-scoped heartbeat, session, active lease, queue and last successful poll/realtime timestamps. Accounts are ordered by accountId and paged in the database before health enrichment; workerLeaseActive is true only while the lease expiry is later than returned now. online only means a fresh worker heartbeat; inspect session, breaker and last-success fields together. No worker identities, cookies or raw errors. Returned now and all timestamps use epoch seconds.",
         "parameters": [
           {
             "schema": {
@@ -17444,7 +17192,8 @@
                             "type": "boolean"
                           },
                           "workerLeaseActive": {
-                            "type": "boolean"
+                            "type": "boolean",
+                            "description": "True only when the account lease expires after the response now timestamp."
                           },
                           "lastBeatAt": {
                             "anyOf": [

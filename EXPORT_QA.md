@@ -5,7 +5,7 @@ retention policy. Creation requires `api:write`; status and download require
 `api:read`. Downloads become native Harness attachments while credentials stay
 inside the plugin.
 
-Validation covers CSV, XLSX, JSON, PDF and Markdown/image ZIP exports:
+Historical results below include PDF creation on older backends. Current releases create CSV, XLSX, JSON and Markdown/image ZIP exports.
 
 - Create and poll an owned export until ready, then download the same artifact.
 - Check byte length, file format, attachment identity and truncation metadata.

@@ -6,24 +6,24 @@
 - “找出「<成员昵称>」的 UID，总结该成员上个月关于某个话题的发言，附原文链接。”
 - “统计「<成员昵称>」发出的红包，按年月画条形图。发送条数和可见领取金额分别展示。”
 
-标准 Harness 提供 46 个原生工具（`weibo_` 前缀，含查询、导出任务、附件下载、监控管理、采集任务和通知诊断）：账号与群发现、成员与资料查询、
-消息搜索/批量读取/上下文/窗口、时间线、发言与关键词统计、词云、归档图片读取、采集任务、采集状态和通知诊断。
+标准 Harness 提供 45 个原生工具（`weibo_` 前缀，含查询、导出任务、附件下载、监控管理、采集任务和通知诊断）：账号与群发现、成员与资料查询、
+消息搜索/批量读取/上下文/窗口、时间线、发言与关键词统计、归档图片读取、采集任务、采集状态和通知诊断。
 自然语言理解和回答由 Harness 当前选择的模型完成，不需要再配置一套模型。
-支持复用后台生成 CSV/XLSX/JSON、单人 PDF/ZIP，并以原生文件附件交付。微博发送、图片/视频上传和撤回工具继续不注册。已验证命令行 Harness **0.2.0-rc.2** 和桌面版 **0.2.2-rc.2** 的工具接口。
+支持复用后台生成 CSV/XLSX/JSON、单人 Markdown+图片 ZIP，并以原生文件附件交付。微博发送、图片/视频上传和撤回工具继续不注册。已验证命令行 Harness **0.2.0-rc.2** 和桌面版 **0.2.2-rc.2** 的工具接口。
 
 ## 安装
 
 通过固定的 GitHub 版本安装：
 
 ```sh
-dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.6.3
-dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.6.3
+dsh plugin --profile web add github:charlesjson/dsh-weibogroup#v0.6.4
+dsh plugin --profile headless add github:charlesjson/dsh-weibogroup#v0.6.4
 ```
 
 桌面版在插件页填写同一 GitHub 引用：
 
 ```text
-github:charlesjson/dsh-weibogroup#v0.6.3
+github:charlesjson/dsh-weibogroup#v0.6.4
 ```
 
 安装后重启对应 Harness 实例。版本标签与锁文件固定源码提交，避免跟随 main
@@ -71,10 +71,11 @@ Token 每次调用时读取，轮换后无需重新打包。安装包不含网�
 
 ## 复用后台导出
 
-可以直接提问“把 「<群名称>」最近三天消息导出成 Excel”或“把某成员上周的发言导出成 PDF”。
+可以直接提问“把 「<群名称>」最近三天消息导出成 Excel”或“把某成员上周的发言导出成 ZIP”。
 
 1. `weibo_createMessageExport`：CSV、XLSX、JSON，支持日期、关键词及可选 senderUid/order（默认正序；最近N条用order=desc配合limit）；关键词按逗号/分号/换行分隔，匹配任一字面关键词，不是搜索接口的 Boolean q 语法。
-2. `weibo_createUserExport`：指定成员的 PDF 或 Markdown+图片 ZIP，保留后台个人阅读版的系统/平台提示过滤口径；CSV/XLSX/JSON 则保留 messageKind 原始分类。
+2. `weibo_createUserExport`：指定成员的 Markdown+图片 ZIP，保留后台个人阅读版的系统/平台提示过滤口径；CSV/XLSX/JSON 则保留 messageKind 原始分类。
+   历史 PDF 任务仍可在文件有效期内查询和下载。
 3. 用 `weibo_getExportJob` 查询返回的任务 ID，等待 `ready`；失败时查看 errorCode。
 4. `weibo_downloadExport` 流式下载并存入 Harness 原生附件，聊天中可以点击文件下载。Token 不进入模型参数/下载链接，文件内容不通过 base64 填入上下文。
 
@@ -168,7 +169,7 @@ Harness 普通消息搜索只读取请求的一页，`limit=10` 最多返回10�
 
 插件将分页方法同时写进工具参数、工具说明和模型系统指引。无需修改后端 REST API。
 本节能力从 `0.6.3` 开始提供。桌面 profile 由 DSH 应用管理，须通过桌面插件页安装
-上面的 GitHub 引用或本地 `dsh-weibogroup-0.6.3.tgz`；CLI 不支持直接管理桌面 profile。
+上面的 GitHub 引用或本地 `dsh-weibogroup-0.6.4.tgz`；CLI 不支持直接管理桌面 profile。
 安装后重启相应实例，加载新工具参数与模型指引。
 
 | 工具 | 首次读取 | 继续读取 |
@@ -211,7 +212,7 @@ Harness 普通消息搜索只读取请求的一页，`limit=10` 最多返回10�
 | `src/harness/register.ts`、`exports.ts` | 宿主工具注册、生命周期、展示和附件交付 |
 | `src/harness/instructions/` | 按查询、导出、监控、采集、图片和通知诊断维护模型指引，由 `instructions.ts` 统一组合 |
 | `src/contracts/` | 随包分发的 API 契约 |
-| `src/vendor/` | 从后端同步的 schema 校验、HTTP 执行及分页实现 |
+| `src/vendor/` | 插件维护的契约编译、HTTP 执行和分页实现，以及来自后端的传输与图片校验模块 |
 
 扩展后端 API 时，在契约声明操作及读写语义，再执行同步和测试即可自动注册
 只读工具；写工具仅开放明确标注 export/monitor/collection 能力的操作，发送和撤回微博消息不开放。
@@ -223,7 +224,7 @@ npm test
 npm pack
 ```
 
-同步脚本直接从后端契约生成 OpenAPI，同时更新共享模块和
+同步脚本直接从后端契约生成 OpenAPI，同时更新传输与图片校验模块和
 `vendor-provenance.json` 中的提交号、工作区状态及 SHA-256。
 打包只使用已保存的快照，不要求安装机器存在后端源码。
 需要增加宿主交互时修改 `src/harness/`；归档调用通过

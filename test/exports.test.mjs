@@ -40,10 +40,28 @@ const normal = url => url.pathname.endsWith('/download')
 
 test('catalog permits file-generation writes but excludes Weibo sends and binary JSON tools', () => {
   const catalog = archiveToolCatalog()
-  assert.equal(catalog.tools.length, 44)
+  assert.equal(catalog.tools.length, 43)
   assert.equal(catalog.operations.get('createMessageExport').tool.annotations.readOnlyHint, false)
   assert.equal(catalog.operations.get('createUserExport').tool._meta['weibogroup/capability'], 'export')
-  for (const name of ['sendGroupMessage', 'sendGroupImage', 'recallGroupMessage', 'sendGroupVideo', 'downloadExportFile', 'marketQuote']) assert.equal(catalog.operations.has(name), false)
+  const createUser = catalog.operations.get('createUserExport')
+  assert.deepEqual(createUser.tool.inputSchema.properties.format.enum, ['zip'])
+  assert.equal(createUser.validateArguments({ accountId: 'a', groupId: 'g', senderUid: '123', format: 'pdf' }).valid, false)
+  for (const name of ['getWordCloud', 'sendGroupMessage', 'sendGroupImage', 'recallGroupMessage', 'sendGroupVideo', 'downloadExportFile', 'marketQuote']) assert.equal(catalog.operations.has(name), false)
+})
+
+test('a ready legacy PDF can still be downloaded', async t => {
+  const data = Buffer.from('%PDF-1.4\nfixture')
+  const legacy = { ...job, kind: 'user', format: 'pdf', filename: 'prior.pdf', contentType: 'application/pdf', size: data.length }
+  const { client } = await fixture(t, url => url.pathname.endsWith('/download')
+    ? new Response(data, { headers: { 'content-type': legacy.contentType } })
+    : Response.json({ job: legacy }))
+  const download = await client.openExport(id, new AbortController().signal)
+  try {
+    const received = []
+    for await (const chunk of download.data) received.push(chunk)
+    assert.equal(download.filename, legacy.filename)
+    assert.deepEqual(Buffer.concat(received), data)
+  } finally { await download.close() }
 })
 
 test('authenticated export download preserves UTF-8 bytes and filename without returning a bearer URL', async t => {
